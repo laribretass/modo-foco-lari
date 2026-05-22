@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedProgressoRouteImport } from './routes/_authenticated/progresso'
+import { Route as AuthenticatedMateriasRouteImport } from './routes/_authenticated/materias'
+import { Route as AuthenticatedMateriasIdRouteImport } from './routes/_authenticated/materias.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -21,30 +25,67 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProgressoRoute = AuthenticatedProgressoRouteImport.update({
+  id: '/progresso',
+  path: '/progresso',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMateriasRoute = AuthenticatedMateriasRouteImport.update({
+  id: '/materias',
+  path: '/materias',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMateriasIdRoute = AuthenticatedMateriasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedMateriasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedRoute
+  '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/materias': typeof AuthenticatedMateriasRouteWithChildren
+  '/progresso': typeof AuthenticatedProgressoRoute
+  '/materias/$id': typeof AuthenticatedMateriasIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthenticatedRoute
   '/login': typeof LoginRoute
+  '/materias': typeof AuthenticatedMateriasRouteWithChildren
+  '/progresso': typeof AuthenticatedProgressoRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/materias/$id': typeof AuthenticatedMateriasIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/materias': typeof AuthenticatedMateriasRouteWithChildren
+  '/_authenticated/progresso': typeof AuthenticatedProgressoRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/materias/$id': typeof AuthenticatedMateriasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths: '/' | '/login' | '/materias' | '/progresso' | '/materias/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/_authenticated' | '/login'
+  to: '/login' | '/materias' | '/progresso' | '/' | '/materias/$id'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/materias'
+    | '/_authenticated/progresso'
+    | '/_authenticated/'
+    | '/_authenticated/materias/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRoute: typeof AuthenticatedRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -64,11 +105,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/': {
+      id: '/_authenticated/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/progresso': {
+      id: '/_authenticated/progresso'
+      path: '/progresso'
+      fullPath: '/progresso'
+      preLoaderRoute: typeof AuthenticatedProgressoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/materias': {
+      id: '/_authenticated/materias'
+      path: '/materias'
+      fullPath: '/materias'
+      preLoaderRoute: typeof AuthenticatedMateriasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/materias/$id': {
+      id: '/_authenticated/materias/$id'
+      path: '/$id'
+      fullPath: '/materias/$id'
+      preLoaderRoute: typeof AuthenticatedMateriasIdRouteImport
+      parentRoute: typeof AuthenticatedMateriasRoute
+    }
   }
 }
 
+interface AuthenticatedMateriasRouteChildren {
+  AuthenticatedMateriasIdRoute: typeof AuthenticatedMateriasIdRoute
+}
+
+const AuthenticatedMateriasRouteChildren: AuthenticatedMateriasRouteChildren = {
+  AuthenticatedMateriasIdRoute: AuthenticatedMateriasIdRoute,
+}
+
+const AuthenticatedMateriasRouteWithChildren =
+  AuthenticatedMateriasRoute._addFileChildren(
+    AuthenticatedMateriasRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedMateriasRoute: typeof AuthenticatedMateriasRouteWithChildren
+  AuthenticatedProgressoRoute: typeof AuthenticatedProgressoRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedMateriasRoute: AuthenticatedMateriasRouteWithChildren,
+  AuthenticatedProgressoRoute: AuthenticatedProgressoRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRoute: AuthenticatedRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
