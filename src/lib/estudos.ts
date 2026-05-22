@@ -19,9 +19,11 @@ export type Topico = {
   revisao1_feita: boolean;
   revisao1_acertos: number;
   revisao1_data: string | null;
+  revisao1_agendada_para: string | null;
   revisao2_feita: boolean;
   revisao2_acertos: number;
   revisao2_data: string | null;
+  revisao2_agendada_para: string | null;
   flashcards_feitos: boolean;
   observacoes: string | null;
   ultima_atividade: string;
@@ -30,6 +32,14 @@ export type Topico = {
 export type Disciplina = {
   id: number; nome: string; area: string; cor: string; icone: string | null;
 };
+
+/** Retorna 1 ou 2 se há revisão vencida (data agendada <= hoje), senão null. */
+export function revisaoVencida(t: Pick<Topico, "revisao1_agendada_para" | "revisao1_feita" | "revisao2_agendada_para" | "revisao2_feita">): 1 | 2 | null {
+  const hoje = new Date().toISOString().slice(0, 10);
+  if (t.revisao1_agendada_para && !t.revisao1_feita && t.revisao1_agendada_para <= hoje) return 1;
+  if (t.revisao2_agendada_para && !t.revisao2_feita && t.revisao2_agendada_para <= hoje) return 2;
+  return null;
+}
 
 export type ProximaAcao =
   | "Pré-aula" | "Teoria" | "Mapeamento" | "Questões"
