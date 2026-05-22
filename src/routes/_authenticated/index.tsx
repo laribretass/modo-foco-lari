@@ -180,7 +180,7 @@ function CoachCard() {
   const dataKey = new Date().toISOString().slice(0, 10);
   const { data, isLoading } = useQuery({
     queryKey: ["briefing", dataKey],
-    queryFn: () => fetchBriefing({ data: {} }),
+    queryFn: () => fetchBriefing(),
     staleTime: 1000 * 60 * 60 * 6, // 6h
     retry: false,
   });
