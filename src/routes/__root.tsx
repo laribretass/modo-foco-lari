@@ -55,6 +55,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#7c3aed" },
       { title: "Foco Total — Estudos ENEM" },
       { name: "description", content: "Sistema de organização de estudos para o ENEM" },
+      { property: "og:title", content: "Foco Total — Estudos ENEM" },
+      { name: "twitter:title", content: "Foco Total — Estudos ENEM" },
+      { property: "og:description", content: "Sistema de organização de estudos para o ENEM" },
+      { name: "twitter:description", content: "Sistema de organização de estudos para o ENEM" },
+      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
