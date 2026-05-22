@@ -15,10 +15,10 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSimuladosRouteImport } from './routes/_authenticated/simulados'
 import { Route as AuthenticatedRedacaoRouteImport } from './routes/_authenticated/redacao'
 import { Route as AuthenticatedProgressoRouteImport } from './routes/_authenticated/progresso'
-import { Route as AuthenticatedMateriasRouteImport } from './routes/_authenticated/materias'
 import { Route as AuthenticatedGradeRouteImport } from './routes/_authenticated/grade'
 import { Route as AuthenticatedCoragemRouteImport } from './routes/_authenticated/coragem'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
+import { Route as AuthenticatedMateriasIndexRouteImport } from './routes/_authenticated/materias.index'
 import { Route as AuthenticatedMateriasIdRouteImport } from './routes/_authenticated/materias.$id'
 
 const LoginRoute = LoginRouteImport.update({
@@ -50,11 +50,6 @@ const AuthenticatedProgressoRoute = AuthenticatedProgressoRouteImport.update({
   path: '/progresso',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedMateriasRoute = AuthenticatedMateriasRouteImport.update({
-  id: '/materias',
-  path: '/materias',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedGradeRoute = AuthenticatedGradeRouteImport.update({
   id: '/grade',
   path: '/grade',
@@ -71,10 +66,16 @@ const AuthenticatedConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedMateriasIndexRoute =
+  AuthenticatedMateriasIndexRouteImport.update({
+    id: '/materias/',
+    path: '/materias/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedMateriasIdRoute = AuthenticatedMateriasIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedMateriasRoute,
+  id: '/materias/$id',
+  path: '/materias/$id',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -83,23 +84,23 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/coragem': typeof AuthenticatedCoragemRoute
   '/grade': typeof AuthenticatedGradeRoute
-  '/materias': typeof AuthenticatedMateriasRouteWithChildren
   '/progresso': typeof AuthenticatedProgressoRoute
   '/redacao': typeof AuthenticatedRedacaoRoute
   '/simulados': typeof AuthenticatedSimuladosRoute
   '/materias/$id': typeof AuthenticatedMateriasIdRoute
+  '/materias/': typeof AuthenticatedMateriasIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/coragem': typeof AuthenticatedCoragemRoute
   '/grade': typeof AuthenticatedGradeRoute
-  '/materias': typeof AuthenticatedMateriasRouteWithChildren
   '/progresso': typeof AuthenticatedProgressoRoute
   '/redacao': typeof AuthenticatedRedacaoRoute
   '/simulados': typeof AuthenticatedSimuladosRoute
   '/': typeof AuthenticatedIndexRoute
   '/materias/$id': typeof AuthenticatedMateriasIdRoute
+  '/materias': typeof AuthenticatedMateriasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -108,12 +109,12 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/coragem': typeof AuthenticatedCoragemRoute
   '/_authenticated/grade': typeof AuthenticatedGradeRoute
-  '/_authenticated/materias': typeof AuthenticatedMateriasRouteWithChildren
   '/_authenticated/progresso': typeof AuthenticatedProgressoRoute
   '/_authenticated/redacao': typeof AuthenticatedRedacaoRoute
   '/_authenticated/simulados': typeof AuthenticatedSimuladosRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/materias/$id': typeof AuthenticatedMateriasIdRoute
+  '/_authenticated/materias/': typeof AuthenticatedMateriasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,23 +124,23 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/coragem'
     | '/grade'
-    | '/materias'
     | '/progresso'
     | '/redacao'
     | '/simulados'
     | '/materias/$id'
+    | '/materias/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/configuracoes'
     | '/coragem'
     | '/grade'
-    | '/materias'
     | '/progresso'
     | '/redacao'
     | '/simulados'
     | '/'
     | '/materias/$id'
+    | '/materias'
   id:
     | '__root__'
     | '/_authenticated'
@@ -147,12 +148,12 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes'
     | '/_authenticated/coragem'
     | '/_authenticated/grade'
-    | '/_authenticated/materias'
     | '/_authenticated/progresso'
     | '/_authenticated/redacao'
     | '/_authenticated/simulados'
     | '/_authenticated/'
     | '/_authenticated/materias/$id'
+    | '/_authenticated/materias/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,13 +205,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgressoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/materias': {
-      id: '/_authenticated/materias'
-      path: '/materias'
-      fullPath: '/materias'
-      preLoaderRoute: typeof AuthenticatedMateriasRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/grade': {
       id: '/_authenticated/grade'
       path: '/grade'
@@ -232,49 +226,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/materias/': {
+      id: '/_authenticated/materias/'
+      path: '/materias'
+      fullPath: '/materias/'
+      preLoaderRoute: typeof AuthenticatedMateriasIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/materias/$id': {
       id: '/_authenticated/materias/$id'
-      path: '/$id'
+      path: '/materias/$id'
       fullPath: '/materias/$id'
       preLoaderRoute: typeof AuthenticatedMateriasIdRouteImport
-      parentRoute: typeof AuthenticatedMateriasRoute
+      parentRoute: typeof AuthenticatedRoute
     }
   }
 }
-
-interface AuthenticatedMateriasRouteChildren {
-  AuthenticatedMateriasIdRoute: typeof AuthenticatedMateriasIdRoute
-}
-
-const AuthenticatedMateriasRouteChildren: AuthenticatedMateriasRouteChildren = {
-  AuthenticatedMateriasIdRoute: AuthenticatedMateriasIdRoute,
-}
-
-const AuthenticatedMateriasRouteWithChildren =
-  AuthenticatedMateriasRoute._addFileChildren(
-    AuthenticatedMateriasRouteChildren,
-  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedCoragemRoute: typeof AuthenticatedCoragemRoute
   AuthenticatedGradeRoute: typeof AuthenticatedGradeRoute
-  AuthenticatedMateriasRoute: typeof AuthenticatedMateriasRouteWithChildren
   AuthenticatedProgressoRoute: typeof AuthenticatedProgressoRoute
   AuthenticatedRedacaoRoute: typeof AuthenticatedRedacaoRoute
   AuthenticatedSimuladosRoute: typeof AuthenticatedSimuladosRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedMateriasIdRoute: typeof AuthenticatedMateriasIdRoute
+  AuthenticatedMateriasIndexRoute: typeof AuthenticatedMateriasIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedCoragemRoute: AuthenticatedCoragemRoute,
   AuthenticatedGradeRoute: AuthenticatedGradeRoute,
-  AuthenticatedMateriasRoute: AuthenticatedMateriasRouteWithChildren,
   AuthenticatedProgressoRoute: AuthenticatedProgressoRoute,
   AuthenticatedRedacaoRoute: AuthenticatedRedacaoRoute,
   AuthenticatedSimuladosRoute: AuthenticatedSimuladosRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedMateriasIdRoute: AuthenticatedMateriasIdRoute,
+  AuthenticatedMateriasIndexRoute: AuthenticatedMateriasIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -288,3 +278,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

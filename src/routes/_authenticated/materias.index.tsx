@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { progressoTopico, type Topico, type Disciplina } from "@/lib/estudos";
 import { motion } from "framer-motion";
 
-export const Route = createFileRoute("/_authenticated/materias")({ component: MateriasPage });
+export const Route = createFileRoute("/_authenticated/materias/")({ component: MateriasPage });
 
 function MateriasPage() {
   const { user } = useAuth();
