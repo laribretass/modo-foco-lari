@@ -1,17 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { getTopicosParaHoje, proximaAcao, progressoTopico, pctAcerto, type Topico, type Disciplina } from "@/lib/estudos";
+import {
+  getTopicosParaHoje, proximaAcao, progressoTopico, pctAcerto, revisaoVencida,
+  type Topico, type Disciplina,
+} from "@/lib/estudos";
+import { calcStreak } from "@/lib/streak";
+import { getBriefingDoDia } from "@/lib/coach.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Circle, Flame, Target, BookOpen, ChevronRight, Sparkles } from "lucide-react";
-import { format } from "date-fns";
+import {
+  CheckCircle2, Circle, Flame, Target, BookOpen, ChevronRight, Sparkles, Timer, AlertCircle, Bot,
+} from "lucide-react";
+import { format, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { PomodoroDialog } from "@/components/PomodoroDialog";
 
 export const Route = createFileRoute("/_authenticated/")({ component: HojePage });
 
@@ -45,32 +55,54 @@ function HojePage() {
     enabled: !!user,
   });
 
-  const { data: sessoesHoje } = useQuery({
-    queryKey: ["sessoes-hoje", user?.id, dataStr],
+  // Sessões dos últimos 60 dias — alimenta streak + contagem do dia
+  const { data: sessoes60 } = useQuery({
+    queryKey: ["sessoes-60d", user?.id, dataStr],
     queryFn: async () => {
-      const { data } = await supabase.from("sessoes_estudo").select("*").eq("data", dataStr);
+      const desde = subDays(new Date(), 60).toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("sessoes_estudo").select("data, topico_id, tipo_atividade")
+        .gte("data", desde).eq("concluido", true);
       return data ?? [];
     },
     enabled: !!user,
   });
 
+  // Todos os tópicos (para "pendentes reais" = com revisão vencida ou nunca estudados)
+  const { data: todosTopicos } = useQuery({
+    queryKey: ["todos-topicos", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("topicos").select("*");
+      return (data ?? []) as Topico[];
+    },
+    enabled: !!user,
+  });
+
+  // Questões registradas HOJE (lendo tópicos com ultima_atividade=hoje seria impreciso; usamos sessoes do tipo "Questões")
+  const questoesHoje = sessoes60?.filter((s) => s.data === dataStr && s.tipo_atividade === "Questões").length ?? 0;
+  const sessoesHojeCount = sessoes60?.filter((s) => s.data === dataStr).length ?? 0;
+  const streak = calcStreak((sessoes60 ?? []).map((s) => s.data));
+
+  // Pendentes reais = revisões vencidas
+  const revisoesVencidas = todosTopicos?.filter((t) => revisaoVencida(t) !== null).length ?? 0;
+
   const concluirSessao = useMutation({
     mutationFn: async ({ topicoId, tipo }: { topicoId: number; tipo: string }) => {
-      const { error } = await supabase.from("sessoes_estudo").insert({
+      // upsert idempotente — não duplica
+      const { error } = await supabase.from("sessoes_estudo").upsert({
         user_id: user!.id, topico_id: topicoId, tipo_atividade: tipo,
         data: dataStr, concluido: true, concluido_em: new Date().toISOString(),
-      });
+      }, { onConflict: "user_id,topico_id,data,tipo_atividade" });
       if (error) throw error;
       await supabase.from("topicos").update({ ultima_atividade: new Date().toISOString() }).eq("id", topicoId);
     },
     onSuccess: () => {
       toast.success("Sessão registrada! 🔥");
-      qc.invalidateQueries({ queryKey: ["hoje"] });
-      qc.invalidateQueries({ queryKey: ["sessoes-hoje"] });
+      qc.invalidateQueries();
     },
+    onError: (e: any) => toast.error(e.message ?? "Erro ao registrar"),
   });
 
-  const sessoesConcluidas = sessoesHoje?.length ?? 0;
   const metaQuestoes = profile?.meta_diaria_questoes ?? 30;
   const discMap = new Map(disciplinas?.map((d) => [d.id, d]) ?? []);
 
@@ -85,11 +117,29 @@ function HojePage() {
         </h1>
       </motion.div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard icon={Flame} label="Sessões" value={sessoesConcluidas} color="text-orange-500" />
-        <StatCard icon={Target} label="Meta diária" value={`${metaQuestoes}q`} color="text-primary" />
-        <StatCard icon={BookOpen} label="Pendentes" value={topicos?.length ?? 0} color="text-success" />
+      <div className="grid grid-cols-4 gap-2">
+        <StatCard icon={Flame} label="Streak" value={`${streak}d`} color="text-orange-500" />
+        <StatCard icon={Target} label="Questões" value={`${questoesHoje}/${metaQuestoes}`} color="text-primary" />
+        <StatCard icon={CheckCircle2} label="Sessões" value={sessoesHojeCount} color="text-success" />
+        <StatCard icon={AlertCircle} label="Revisões" value={revisoesVencidas} color={revisoesVencidas > 0 ? "text-destructive" : "text-muted-foreground"} />
       </div>
+
+      <CoachCard />
+
+      {revisoesVencidas > 0 && (
+        <Link to="/materias">
+          <Card className="border-destructive/30 bg-destructive/5 hover:bg-destructive/10 transition-colors">
+            <CardContent className="p-3 flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+              <div className="flex-1 text-sm">
+                <span className="font-semibold">{revisoesVencidas} revis{revisoesVencidas === 1 ? "ão vencida" : "ões vencidas"}</span>
+                <span className="text-muted-foreground"> — abra Matérias para resolver</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </CardContent>
+          </Card>
+        </Link>
+      )}
 
       <div className="flex items-center justify-between mt-6">
         <h2 className="text-xl font-display font-semibold flex items-center gap-2">
@@ -125,13 +175,49 @@ function HojePage() {
   );
 }
 
+function CoachCard() {
+  const fetchBriefing = useServerFn(getBriefingDoDia);
+  const dataKey = new Date().toISOString().slice(0, 10);
+  const { data, isLoading } = useQuery({
+    queryKey: ["briefing", dataKey],
+    queryFn: () => fetchBriefing(),
+    staleTime: 1000 * 60 * 60 * 6, // 6h
+    retry: false,
+  });
+
+  return (
+    <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20">
+      <CardContent className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+            <Bot className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-semibold text-primary mb-1">Coach IA · briefing do dia</div>
+            {isLoading ? (
+              <div className="space-y-1.5">
+                <div className="h-3 rounded bg-muted animate-pulse w-full" />
+                <div className="h-3 rounded bg-muted animate-pulse w-4/5" />
+              </div>
+            ) : data?.briefing ? (
+              <p className="text-sm leading-relaxed">{data.briefing}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">{data?.error ?? "Sem briefing por enquanto. Registre algumas sessões!"}</p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function StatCard({ icon: Icon, label, value, color }: any) {
   return (
     <Card>
       <CardContent className="p-3 flex flex-col items-center text-center">
         <Icon className={`w-5 h-5 ${color}`} />
-        <div className="text-2xl font-bold mt-1">{value}</div>
-        <div className="text-xs text-muted-foreground">{label}</div>
+        <div className="text-xl font-bold mt-1 tabular-nums">{value}</div>
+        <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</div>
       </CardContent>
     </Card>
   );
@@ -142,17 +228,26 @@ function TopicoCard({ topico, disciplina, acao, onConcluir }: {
 }) {
   const prog = progressoTopico(topico);
   const pct = pctAcerto(topico);
+  const rev = revisaoVencida(topico);
+  const [pomoOpen, setPomoOpen] = useState(false);
+  const qc = useQueryClient();
+
   return (
     <Card className="overflow-hidden">
       <div className="h-1.5" style={{ backgroundColor: disciplina?.cor ?? "#888" }} />
       <CardContent className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <Badge variant="secondary" style={{ backgroundColor: `${disciplina?.cor}22`, color: disciplina?.cor }}>
                 {disciplina?.nome}
               </Badge>
               <Badge variant="outline" className="text-xs">{topico.recorrencia}</Badge>
+              {rev && (
+                <Badge className="text-xs bg-destructive text-destructive-foreground">
+                  Revisão {rev} vencida
+                </Badge>
+              )}
             </div>
             <h3 className="font-semibold leading-tight">{topico.tema}</h3>
             {topico.subtema && <p className="text-xs text-muted-foreground mt-0.5">{topico.subtema}</p>}
@@ -165,12 +260,33 @@ function TopicoCard({ topico, disciplina, acao, onConcluir }: {
         <Progress value={prog} className="h-1.5" />
         <div className="flex gap-2">
           <Button size="sm" className="flex-1" onClick={onConcluir}>
-            <CheckCircle2 className="w-4 h-4 mr-1" /> Concluir {acao}
+            <CheckCircle2 className="w-4 h-4 mr-1" /> Concluir
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setPomoOpen(true)} title="Pomodoro 25min">
+            <Timer className="w-4 h-4" />
           </Button>
           <Link to="/materias/$id" params={{ id: String(topico.disciplina_id) }}>
             <Button size="sm" variant="outline"><ChevronRight className="w-4 h-4" /></Button>
           </Link>
         </div>
+
+        <PomodoroDialog
+          open={pomoOpen}
+          onOpenChange={setPomoOpen}
+          titulo={topico.tema}
+          subtitulo={disciplina?.nome}
+          cor={disciplina?.cor}
+          onFocoCompleto={async () => {
+            await supabase.from("sessoes_estudo").upsert({
+              user_id: topico.user_id, topico_id: topico.id, tipo_atividade: acao,
+              data: new Date().toISOString().slice(0, 10), concluido: true,
+              concluido_em: new Date().toISOString(),
+            }, { onConflict: "user_id,topico_id,data,tipo_atividade" });
+            await supabase.from("topicos").update({ ultima_atividade: new Date().toISOString() }).eq("id", topico.id);
+            toast.success("Pomodoro completo! Sessão registrada 🎯");
+            qc.invalidateQueries();
+          }}
+        />
       </CardContent>
     </Card>
   );

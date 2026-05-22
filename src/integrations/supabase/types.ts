@@ -397,9 +397,11 @@ export type Database = {
           questoes_feitas: number
           recorrencia: string
           revisao1_acertos: number
+          revisao1_agendada_para: string | null
           revisao1_data: string | null
           revisao1_feita: boolean
           revisao2_acertos: number
+          revisao2_agendada_para: string | null
           revisao2_data: string | null
           revisao2_feita: boolean
           subtema: string | null
@@ -423,9 +425,11 @@ export type Database = {
           questoes_feitas?: number
           recorrencia?: string
           revisao1_acertos?: number
+          revisao1_agendada_para?: string | null
           revisao1_data?: string | null
           revisao1_feita?: boolean
           revisao2_acertos?: number
+          revisao2_agendada_para?: string | null
           revisao2_data?: string | null
           revisao2_feita?: boolean
           subtema?: string | null
@@ -449,9 +453,11 @@ export type Database = {
           questoes_feitas?: number
           recorrencia?: string
           revisao1_acertos?: number
+          revisao1_agendada_para?: string | null
           revisao1_data?: string | null
           revisao1_feita?: boolean
           revisao2_acertos?: number
+          revisao2_agendada_para?: string | null
           revisao2_data?: string | null
           revisao2_feita?: boolean
           subtema?: string | null

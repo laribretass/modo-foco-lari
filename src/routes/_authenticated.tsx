@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { QuickQuestionsFAB } from "@/components/QuickQuestionsFAB";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
@@ -128,6 +129,8 @@ function AuthLayout() {
           <Outlet />
         </main>
       </div>
+
+      <QuickQuestionsFAB />
 
       {/* Bottom tab bar — mobile only */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-md safe-bottom">
