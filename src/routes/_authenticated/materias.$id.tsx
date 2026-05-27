@@ -42,9 +42,31 @@ function MateriaDetail() {
     queryFn: async () => {
       const { data } = await supabase.from("topicos").select("*")
         .eq("disciplina_id", discId).order("tema");
-      return (data ?? []) as Topico[];
+      return (data ?? []) as TopicoExt[];
     },
     enabled: !!user,
+  });
+
+  // Quais tópicos têm pré-req pendente? Pega vínculos e cruza com .dominado
+  const { data: pendentesIds } = useQuery({
+    queryKey: ["topicos-pendentes-prereq", user?.id, discId, topicos?.length],
+    queryFn: async () => {
+      const ids = (topicos ?? []).map((t) => t.id);
+      if (ids.length === 0) return new Set<number>();
+      const { data: pr } = await supabase.from("topico_prerequisitos")
+        .select("topico_id, prerequisito_topico_id")
+        .in("topico_id", ids);
+      const pids = Array.from(new Set((pr ?? []).map((r) => r.prerequisito_topico_id)));
+      if (pids.length === 0) return new Set<number>();
+      const { data: doms } = await supabase.from("topicos").select("id, dominado").in("id", pids);
+      const domMap = new Map((doms ?? []).map((d: any) => [d.id, d.dominado as boolean]));
+      const set = new Set<number>();
+      (pr ?? []).forEach((row) => {
+        if (!domMap.get(row.prerequisito_topico_id)) set.add(row.topico_id);
+      });
+      return set;
+    },
+    enabled: !!topicos && topicos.length > 0,
   });
 
   const addTopico = useMutation({
