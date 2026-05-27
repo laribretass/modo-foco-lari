@@ -24,6 +24,7 @@ import { useState, useEffect } from "react";
 import { PomodoroDialog } from "@/components/PomodoroDialog";
 import { AtrasadosCard } from "@/components/AtrasadosCard";
 import { AnkiCard } from "@/components/AnkiCard";
+import { RepertorioCard } from "@/components/RepertorioCard";
 import { ensureAgendaHoje } from "@/lib/agenda.functions";
 import { useAnkiLembrete } from "@/hooks/use-anki-lembrete";
 
@@ -145,6 +146,10 @@ function HojePage() {
       <AnkiCard />
 
       <AtrasadosCard disciplinas={disciplinas ?? []} />
+
+      <RepertorioCard />
+
+
 
 
 
