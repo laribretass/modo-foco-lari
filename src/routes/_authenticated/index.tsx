@@ -20,8 +20,10 @@ import { format, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PomodoroDialog } from "@/components/PomodoroDialog";
+import { AtrasadosCard } from "@/components/AtrasadosCard";
+import { ensureAgendaHoje } from "@/lib/agenda.functions";
 
 export const Route = createFileRoute("/_authenticated/")({ component: HojePage });
 
@@ -40,6 +42,16 @@ function HojePage() {
     },
     enabled: !!user,
   });
+
+  const ensureFn = useServerFn(ensureAgendaHoje);
+  useEffect(() => {
+    if (!user) return;
+    ensureFn().then((r) => {
+      if (r?.inserted && r.inserted > 0) qc.invalidateQueries({ queryKey: ["agenda-atrasados"] });
+    }).catch(() => {});
+  }, [user?.id]);
+
+
 
   const { data: disciplinas } = useQuery({
     queryKey: ["disciplinas"],
