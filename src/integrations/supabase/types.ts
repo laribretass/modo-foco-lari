@@ -501,6 +501,42 @@ export type Database = {
           },
         ]
       }
+      revisoes_agendadas: {
+        Row: {
+          concluido_em: string | null
+          created_at: string
+          data_prevista: string
+          disciplina_id: number
+          id: number
+          numero_revisao: number
+          status: string
+          topico_id: number
+          user_id: string
+        }
+        Insert: {
+          concluido_em?: string | null
+          created_at?: string
+          data_prevista: string
+          disciplina_id: number
+          id?: number
+          numero_revisao: number
+          status?: string
+          topico_id: number
+          user_id: string
+        }
+        Update: {
+          concluido_em?: string | null
+          created_at?: string
+          data_prevista?: string
+          disciplina_id?: number
+          id?: number
+          numero_revisao?: number
+          status?: string
+          topico_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       sequencia_didatica_padrao: {
         Row: {
           created_at: string
@@ -664,10 +700,13 @@ export type Database = {
       }
       topicos: {
         Row: {
+          concluido_em: string | null
           created_at: string
           disciplina_id: number
           dominado: boolean
           dominado_em: string | null
+          exercicios_data: string | null
+          exercicios_feitos: boolean
           flashcards_feitos: boolean
           id: number
           mapeamento_data: string | null
@@ -696,10 +735,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          concluido_em?: string | null
           created_at?: string
           disciplina_id: number
           dominado?: boolean
           dominado_em?: string | null
+          exercicios_data?: string | null
+          exercicios_feitos?: boolean
           flashcards_feitos?: boolean
           id?: number
           mapeamento_data?: string | null
@@ -728,10 +770,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          concluido_em?: string | null
           created_at?: string
           disciplina_id?: number
           dominado?: boolean
           dominado_em?: string | null
+          exercicios_data?: string | null
+          exercicios_feitos?: boolean
           flashcards_feitos?: boolean
           id?: number
           mapeamento_data?: string | null
@@ -790,6 +835,10 @@ export type Database = {
         Args: { p_topico_id: number }
         Returns: undefined
       }
+      atualizar_status_revisoes: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       calcular_status_cronograma: {
         Args: { p_user_id: string }
         Returns: {
@@ -808,6 +857,10 @@ export type Database = {
           topicos_dia_necessario: number
           topicos_dia_ritmo_atual: number
         }[]
+      }
+      criar_revisoes_automaticas: {
+        Args: { p_topico_id: number }
+        Returns: undefined
       }
       garantir_plano_dia: { Args: { p_user_id: string }; Returns: undefined }
       inicializar_cronograma: {

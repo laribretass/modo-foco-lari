@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSimuladosRouteImport } from './routes/_authenticated/simulados'
+import { Route as AuthenticatedRevisoesRouteImport } from './routes/_authenticated/revisoes'
 import { Route as AuthenticatedRepertoriosRouteImport } from './routes/_authenticated/repertorios'
 import { Route as AuthenticatedRedacaoRouteImport } from './routes/_authenticated/redacao'
 import { Route as AuthenticatedProgressoRouteImport } from './routes/_authenticated/progresso'
@@ -43,6 +44,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
 const AuthenticatedSimuladosRoute = AuthenticatedSimuladosRouteImport.update({
   id: '/simulados',
   path: '/simulados',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRevisoesRoute = AuthenticatedRevisoesRouteImport.update({
+  id: '/revisoes',
+  path: '/revisoes',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedRepertoriosRoute =
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/progresso': typeof AuthenticatedProgressoRoute
   '/redacao': typeof AuthenticatedRedacaoRoute
   '/repertorios': typeof AuthenticatedRepertoriosRoute
+  '/revisoes': typeof AuthenticatedRevisoesRoute
   '/simulados': typeof AuthenticatedSimuladosRoute
   '/materias/$id': typeof AuthenticatedMateriasIdRouteWithChildren
   '/materias/': typeof AuthenticatedMateriasIndexRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/progresso': typeof AuthenticatedProgressoRoute
   '/redacao': typeof AuthenticatedRedacaoRoute
   '/repertorios': typeof AuthenticatedRepertoriosRoute
+  '/revisoes': typeof AuthenticatedRevisoesRoute
   '/simulados': typeof AuthenticatedSimuladosRoute
   '/': typeof AuthenticatedIndexRoute
   '/materias/$id': typeof AuthenticatedMateriasIdRouteWithChildren
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/_authenticated/progresso': typeof AuthenticatedProgressoRoute
   '/_authenticated/redacao': typeof AuthenticatedRedacaoRoute
   '/_authenticated/repertorios': typeof AuthenticatedRepertoriosRoute
+  '/_authenticated/revisoes': typeof AuthenticatedRevisoesRoute
   '/_authenticated/simulados': typeof AuthenticatedSimuladosRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/materias/$id': typeof AuthenticatedMateriasIdRouteWithChildren
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/progresso'
     | '/redacao'
     | '/repertorios'
+    | '/revisoes'
     | '/simulados'
     | '/materias/$id'
     | '/materias/'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/progresso'
     | '/redacao'
     | '/repertorios'
+    | '/revisoes'
     | '/simulados'
     | '/'
     | '/materias/$id'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/_authenticated/progresso'
     | '/_authenticated/redacao'
     | '/_authenticated/repertorios'
+    | '/_authenticated/revisoes'
     | '/_authenticated/simulados'
     | '/_authenticated/'
     | '/_authenticated/materias/$id'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/simulados'
       fullPath: '/simulados'
       preLoaderRoute: typeof AuthenticatedSimuladosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/revisoes': {
+      id: '/_authenticated/revisoes'
+      path: '/revisoes'
+      fullPath: '/revisoes'
+      preLoaderRoute: typeof AuthenticatedRevisoesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/repertorios': {
@@ -379,6 +398,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProgressoRoute: typeof AuthenticatedProgressoRoute
   AuthenticatedRedacaoRoute: typeof AuthenticatedRedacaoRoute
   AuthenticatedRepertoriosRoute: typeof AuthenticatedRepertoriosRoute
+  AuthenticatedRevisoesRoute: typeof AuthenticatedRevisoesRoute
   AuthenticatedSimuladosRoute: typeof AuthenticatedSimuladosRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
@@ -392,6 +412,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProgressoRoute: AuthenticatedProgressoRoute,
   AuthenticatedRedacaoRoute: AuthenticatedRedacaoRoute,
   AuthenticatedRepertoriosRoute: AuthenticatedRepertoriosRoute,
+  AuthenticatedRevisoesRoute: AuthenticatedRevisoesRoute,
   AuthenticatedSimuladosRoute: AuthenticatedSimuladosRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }

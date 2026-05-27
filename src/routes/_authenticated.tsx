@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Home, BookOpen, TrendingUp, FileCheck, Calendar, PenLine, Heart, Settings, LogOut, Sparkles, Menu, Lightbulb } from "lucide-react";
+import { Home, BookOpen, TrendingUp, FileCheck, Calendar, PenLine, Heart, Settings, LogOut, Sparkles, Menu, Lightbulb, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ const bottomTabs = [
 ];
 
 const moreItems = [
+  { to: "/revisoes", label: "Revisões", icon: RotateCcw },
   { to: "/grade", label: "Grade Semanal", icon: Calendar },
   { to: "/redacao", label: "Redação", icon: PenLine },
   { to: "/repertorios", label: "Meus Repertórios", icon: Lightbulb },

@@ -51,7 +51,14 @@ export function PlanoDoDia({
         .eq("data_prevista", hoje)
         .order("id", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as AgendaItem[];
+      const ids = Array.from(new Set((data ?? []).map((a: any) => a.topico_id)));
+      let concluidos = new Set<number>();
+      if (ids.length > 0) {
+        const { data: tops } = await supabase.from("topicos")
+          .select("id, concluido_em").in("id", ids).not("concluido_em", "is", null);
+        concluidos = new Set((tops ?? []).map((t: any) => t.id));
+      }
+      return ((data ?? []) as AgendaItem[]).filter((a) => !concluidos.has(a.topico_id));
     },
     enabled: !!user,
   });
