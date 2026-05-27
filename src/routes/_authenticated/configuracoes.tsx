@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Moon, Sun, Bell } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({ component: ConfigPage });
 
@@ -40,8 +40,14 @@ function ConfigPage() {
   const [nome, setNome] = useState("");
   const [meta, setMeta] = useState(30);
   const [acerto, setAcerto] = useState(70);
+  const [ankiAtivo, setAnkiAtivo] = useState(false);
+  const [ankiHorario, setAnkiHorario] = useState("20:00");
   useEffect(() => {
-    if (profile) { setNome(profile.nome ?? ""); setMeta(profile.meta_diaria_questoes); setAcerto(profile.meta_acerto_pct); }
+    if (profile) {
+      setNome(profile.nome ?? ""); setMeta(profile.meta_diaria_questoes); setAcerto(profile.meta_acerto_pct);
+      setAnkiAtivo((profile as any).anki_lembrete_ativo ?? false);
+      setAnkiHorario(String((profile as any).anki_lembrete_horario ?? "20:00").slice(0, 5));
+    }
   }, [profile]);
 
   const save = useMutation({
@@ -52,6 +58,18 @@ function ConfigPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Salvo"); qc.invalidateQueries({ queryKey: ["profile"] }); },
+  });
+
+  const saveAnki = useMutation({
+    mutationFn: async (patch: { anki_lembrete_ativo?: boolean; anki_lembrete_horario?: string }) => {
+      if (patch.anki_lembrete_ativo && typeof Notification !== "undefined" && Notification.permission === "default") {
+        await Notification.requestPermission();
+      }
+      const { error } = await supabase.from("profiles").update(patch as any).eq("id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["profile"] }); },
+    onError: (e: any) => toast.error(e.message ?? "Erro"),
   });
 
   const logout = async () => { await supabase.auth.signOut(); navigate({ to: "/login" }); };
@@ -79,6 +97,34 @@ function ConfigPage() {
           <Switch checked={dark} onCheckedChange={toggleDark} />
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Bell className="w-4 h-4" /> Notificações</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium">Lembrar de fazer Anki</div>
+              <div className="text-xs text-muted-foreground">Aviso diário se você não revisou os flashcards</div>
+            </div>
+            <Switch
+              checked={ankiAtivo}
+              onCheckedChange={(v) => { setAnkiAtivo(v); saveAnki.mutate({ anki_lembrete_ativo: v }); }}
+            />
+          </div>
+          {ankiAtivo && (
+            <div>
+              <Label>Horário do lembrete</Label>
+              <Input
+                type="time"
+                value={ankiHorario}
+                onChange={(e) => setAnkiHorario(e.target.value)}
+                onBlur={() => saveAnki.mutate({ anki_lembrete_horario: ankiHorario })}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardContent className="p-4">

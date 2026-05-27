@@ -23,7 +23,9 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { PomodoroDialog } from "@/components/PomodoroDialog";
 import { AtrasadosCard } from "@/components/AtrasadosCard";
+import { AnkiCard } from "@/components/AnkiCard";
 import { ensureAgendaHoje } from "@/lib/agenda.functions";
+import { useAnkiLembrete } from "@/hooks/use-anki-lembrete";
 
 export const Route = createFileRoute("/_authenticated/")({ component: HojePage });
 
@@ -50,6 +52,8 @@ function HojePage() {
       if (r?.inserted && r.inserted > 0) qc.invalidateQueries({ queryKey: ["agenda-atrasados"] });
     }).catch(() => {});
   }, [user?.id]);
+
+  useAnkiLembrete();
 
 
 
@@ -138,7 +142,10 @@ function HojePage() {
 
       <CoachCard />
 
+      <AnkiCard />
+
       <AtrasadosCard disciplinas={disciplinas ?? []} />
+
 
 
       {revisoesVencidas > 0 && (

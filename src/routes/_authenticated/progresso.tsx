@@ -5,8 +5,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import { progressoTopico, pctAcerto, type Topico, type Disciplina } from "@/lib/estudos";
-import { Flame, Target, TrendingUp, BookOpen } from "lucide-react";
+import { Flame, Target, TrendingUp, BookOpen, Layers } from "lucide-react";
 import { subDays, format } from "date-fns";
+import { calcAnkiStreak, calcAderenciaMes } from "@/lib/anki";
 
 export const Route = createFileRoute("/_authenticated/progresso")({ component: ProgressoPage });
 
@@ -35,6 +36,19 @@ function ProgressoPage() {
     },
     enabled: !!user,
   });
+  const { data: ankiRev } = useQuery({
+    queryKey: ["anki-revisoes", user?.id],
+    queryFn: async () => {
+      const desde = subDays(new Date(), 90).toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("anki_revisoes_diarias").select("data")
+        .eq("user_id", user!.id).gte("data", desde);
+      return (data ?? []).map((r) => r.data as string);
+    },
+    enabled: !!user,
+  });
+  const ankiStreak = calcAnkiStreak(ankiRev ?? []);
+  const ankiAderencia = calcAderenciaMes(ankiRev ?? []);
 
   const totalQuestoes = topicos?.reduce((s, t) => s + t.questoes_feitas, 0) ?? 0;
   const totalAcertos = topicos?.reduce((s, t) => s + t.questoes_acertos, 0) ?? 0;
@@ -72,6 +86,22 @@ function ProgressoPage() {
         <KPI icon={BookOpen} label="Questões" value={totalQuestoes} color="text-warning" />
         <KPI icon={Flame} label="Sessões (7d)" value={ultimos7.reduce((s, d) => s + d.sessoes, 0)} color="text-orange-500" />
       </div>
+
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+            <Layers className="w-5 h-5" />
+          </div>
+          <div className="flex-1 text-sm">
+            <div className="font-semibold">
+              Anki: {ankiStreak} {ankiStreak === 1 ? "dia seguido" : "dias seguidos"} <Flame className="w-4 h-4 inline text-orange-500" />
+            </div>
+            <div className="text-xs text-muted-foreground">{ankiAderencia}% de aderência este mês</div>
+          </div>
+        </CardContent>
+      </Card>
+
+
 
       <Card>
         <CardHeader><CardTitle className="text-base">Atividade — últimos 7 dias</CardTitle></CardHeader>

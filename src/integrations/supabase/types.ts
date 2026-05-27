@@ -58,6 +58,27 @@ export type Database = {
           },
         ]
       }
+      anki_revisoes_diarias: {
+        Row: {
+          data: string
+          feito_em: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          data: string
+          feito_em?: string
+          id?: number
+          user_id: string
+        }
+        Update: {
+          data?: string
+          feito_em?: string
+          id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       caixa_preta_questoes: {
         Row: {
           assunto: string | null
@@ -309,6 +330,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          anki_lembrete_ativo: boolean
+          anki_lembrete_horario: string
           created_at: string
           id: string
           meta_acerto_pct: number
@@ -316,6 +339,8 @@ export type Database = {
           nome: string | null
         }
         Insert: {
+          anki_lembrete_ativo?: boolean
+          anki_lembrete_horario?: string
           created_at?: string
           id: string
           meta_acerto_pct?: number
@@ -323,6 +348,8 @@ export type Database = {
           nome?: string | null
         }
         Update: {
+          anki_lembrete_ativo?: boolean
+          anki_lembrete_horario?: string
           created_at?: string
           id?: string
           meta_acerto_pct?: number
