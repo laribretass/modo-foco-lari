@@ -23,6 +23,7 @@ import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authen
 import { Route as AuthenticatedMateriasIndexRouteImport } from './routes/_authenticated/materias.index'
 import { Route as AuthenticatedMateriasIdRouteImport } from './routes/_authenticated/materias.$id'
 import { Route as ApiPublicCronPopularAgendasRouteImport } from './routes/api/public/cron/popular-agendas'
+import { Route as AuthenticatedMateriasIdSequenciaRouteImport } from './routes/_authenticated/materias.$id.sequencia'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -97,6 +98,12 @@ const ApiPublicCronPopularAgendasRoute =
     path: '/api/public/cron/popular-agendas',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedMateriasIdSequenciaRoute =
+  AuthenticatedMateriasIdSequenciaRouteImport.update({
+    id: '/sequencia',
+    path: '/sequencia',
+    getParentRoute: () => AuthenticatedMateriasIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -109,8 +116,9 @@ export interface FileRoutesByFullPath {
   '/redacao': typeof AuthenticatedRedacaoRoute
   '/repertorios': typeof AuthenticatedRepertoriosRoute
   '/simulados': typeof AuthenticatedSimuladosRoute
-  '/materias/$id': typeof AuthenticatedMateriasIdRoute
+  '/materias/$id': typeof AuthenticatedMateriasIdRouteWithChildren
   '/materias/': typeof AuthenticatedMateriasIndexRoute
+  '/materias/$id/sequencia': typeof AuthenticatedMateriasIdSequenciaRoute
   '/api/public/cron/popular-agendas': typeof ApiPublicCronPopularAgendasRoute
 }
 export interface FileRoutesByTo {
@@ -123,8 +131,9 @@ export interface FileRoutesByTo {
   '/repertorios': typeof AuthenticatedRepertoriosRoute
   '/simulados': typeof AuthenticatedSimuladosRoute
   '/': typeof AuthenticatedIndexRoute
-  '/materias/$id': typeof AuthenticatedMateriasIdRoute
+  '/materias/$id': typeof AuthenticatedMateriasIdRouteWithChildren
   '/materias': typeof AuthenticatedMateriasIndexRoute
+  '/materias/$id/sequencia': typeof AuthenticatedMateriasIdSequenciaRoute
   '/api/public/cron/popular-agendas': typeof ApiPublicCronPopularAgendasRoute
 }
 export interface FileRoutesById {
@@ -140,8 +149,9 @@ export interface FileRoutesById {
   '/_authenticated/repertorios': typeof AuthenticatedRepertoriosRoute
   '/_authenticated/simulados': typeof AuthenticatedSimuladosRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/materias/$id': typeof AuthenticatedMateriasIdRoute
+  '/_authenticated/materias/$id': typeof AuthenticatedMateriasIdRouteWithChildren
   '/_authenticated/materias/': typeof AuthenticatedMateriasIndexRoute
+  '/_authenticated/materias/$id/sequencia': typeof AuthenticatedMateriasIdSequenciaRoute
   '/api/public/cron/popular-agendas': typeof ApiPublicCronPopularAgendasRoute
 }
 export interface FileRouteTypes {
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/simulados'
     | '/materias/$id'
     | '/materias/'
+    | '/materias/$id/sequencia'
     | '/api/public/cron/popular-agendas'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/'
     | '/materias/$id'
     | '/materias'
+    | '/materias/$id/sequencia'
     | '/api/public/cron/popular-agendas'
   id:
     | '__root__'
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/materias/$id'
     | '/_authenticated/materias/'
+    | '/_authenticated/materias/$id/sequencia'
     | '/api/public/cron/popular-agendas'
   fileRoutesById: FileRoutesById
 }
@@ -298,16 +311,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronPopularAgendasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/materias/$id/sequencia': {
+      id: '/_authenticated/materias/$id/sequencia'
+      path: '/sequencia'
+      fullPath: '/materias/$id/sequencia'
+      preLoaderRoute: typeof AuthenticatedMateriasIdSequenciaRouteImport
+      parentRoute: typeof AuthenticatedMateriasIdRoute
+    }
   }
 }
 
+interface AuthenticatedMateriasIdRouteChildren {
+  AuthenticatedMateriasIdSequenciaRoute: typeof AuthenticatedMateriasIdSequenciaRoute
+}
+
+const AuthenticatedMateriasIdRouteChildren: AuthenticatedMateriasIdRouteChildren =
+  {
+    AuthenticatedMateriasIdSequenciaRoute:
+      AuthenticatedMateriasIdSequenciaRoute,
+  }
+
+const AuthenticatedMateriasIdRouteWithChildren =
+  AuthenticatedMateriasIdRoute._addFileChildren(
+    AuthenticatedMateriasIdRouteChildren,
+  )
+
 interface AuthenticatedMateriasRouteChildren {
-  AuthenticatedMateriasIdRoute: typeof AuthenticatedMateriasIdRoute
+  AuthenticatedMateriasIdRoute: typeof AuthenticatedMateriasIdRouteWithChildren
   AuthenticatedMateriasIndexRoute: typeof AuthenticatedMateriasIndexRoute
 }
 
 const AuthenticatedMateriasRouteChildren: AuthenticatedMateriasRouteChildren = {
-  AuthenticatedMateriasIdRoute: AuthenticatedMateriasIdRoute,
+  AuthenticatedMateriasIdRoute: AuthenticatedMateriasIdRouteWithChildren,
   AuthenticatedMateriasIndexRoute: AuthenticatedMateriasIndexRoute,
 }
 
