@@ -19,7 +19,13 @@ import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PrerequisitosDialog } from "@/components/PrerequisitosDialog";
 
-type TopicoExt = Topico & { dominado?: boolean; ordem_didatica?: number; modulo?: string | null };
+type TopicoExt = Topico & {
+  dominado?: boolean;
+  ordem_didatica?: number;
+  modulo?: string | null;
+  exercicios_feitos?: boolean;
+  concluido_em?: string | null;
+};
 
 export const Route = createFileRoute("/_authenticated/materias/$id")({ component: MateriaDetail });
 
