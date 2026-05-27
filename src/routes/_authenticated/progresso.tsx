@@ -5,8 +5,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 import { progressoTopico, pctAcerto, type Topico, type Disciplina } from "@/lib/estudos";
-import { Flame, Target, TrendingUp, BookOpen } from "lucide-react";
+import { Flame, Target, TrendingUp, BookOpen, Layers } from "lucide-react";
 import { subDays, format } from "date-fns";
+import { calcAnkiStreak, calcAderenciaMes } from "@/lib/anki";
 
 export const Route = createFileRoute("/_authenticated/progresso")({ component: ProgressoPage });
 
@@ -35,6 +36,19 @@ function ProgressoPage() {
     },
     enabled: !!user,
   });
+  const { data: ankiRev } = useQuery({
+    queryKey: ["anki-revisoes", user?.id],
+    queryFn: async () => {
+      const desde = subDays(new Date(), 90).toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("anki_revisoes_diarias").select("data")
+        .eq("user_id", user!.id).gte("data", desde);
+      return (data ?? []).map((r) => r.data as string);
+    },
+    enabled: !!user,
+  });
+  const ankiStreak = calcAnkiStreak(ankiRev ?? []);
+  const ankiAderencia = calcAderenciaMes(ankiRev ?? []);
 
   const totalQuestoes = topicos?.reduce((s, t) => s + t.questoes_feitas, 0) ?? 0;
   const totalAcertos = topicos?.reduce((s, t) => s + t.questoes_acertos, 0) ?? 0;
