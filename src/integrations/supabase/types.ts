@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      agenda_diaria: {
+        Row: {
+          concluido_em: string | null
+          created_at: string
+          data_prevista: string
+          disciplina_id: number
+          id: number
+          proxima_acao: string
+          status: string
+          topico_id: number
+          user_id: string
+        }
+        Insert: {
+          concluido_em?: string | null
+          created_at?: string
+          data_prevista: string
+          disciplina_id: number
+          id?: number
+          proxima_acao: string
+          status?: string
+          topico_id: number
+          user_id: string
+        }
+        Update: {
+          concluido_em?: string | null
+          created_at?: string
+          data_prevista?: string
+          disciplina_id?: number
+          id?: number
+          proxima_acao?: string
+          status?: string
+          topico_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_diaria_topico_id_fkey"
+            columns: ["topico_id"]
+            isOneToOne: false
+            referencedRelation: "topicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       caixa_preta_questoes: {
         Row: {
           assunto: string | null
@@ -489,7 +533,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      popular_agenda_dia: {
+        Args: { p_data: string; p_user: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
