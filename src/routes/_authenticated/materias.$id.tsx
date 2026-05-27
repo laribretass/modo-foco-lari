@@ -148,15 +148,34 @@ function TopicoRow({
     onSuccess: () => { toast.success("Removido"); qc.invalidateQueries({ queryKey: ["topicos"] }); },
   });
 
+  const [prereqOpen, setPrereqOpen] = useState(false);
+
   return (
-    <Card>
+    <Card className={topico.dominado ? "border-emerald-500/40" : temPendente ? "border-amber-400/50" : ""}>
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger asChild>
           <button className="w-full text-left p-3 flex items-center gap-3 hover:bg-muted/50">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {topico.dominado && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                 <h3 className="font-medium truncate">{topico.tema}</h3>
                 <Badge variant="outline" className="text-[10px]">{topico.recorrencia}</Badge>
+                {topico.dominado && (
+                  <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[10px]">
+                    DOMINADO
+                  </Badge>
+                )}
+                {!topico.dominado && temPendente && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setPrereqOpen(true); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); setPrereqOpen(true); } }}
+                    className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded border border-amber-400 text-amber-700 hover:bg-amber-100/50 dark:hover:bg-amber-900/30 cursor-pointer"
+                  >
+                    <AlertTriangle className="w-3 h-3" /> Ver pré-requisitos
+                  </span>
+                )}
               </div>
               {topico.subtema && <p className="text-xs text-muted-foreground truncate">{topico.subtema}</p>}
               <div className="mt-2 flex items-center gap-2">
