@@ -49,7 +49,7 @@ function HojePage() {
       qc.invalidateQueries({ queryKey: ["plano-dia"] });
       qc.invalidateQueries({ queryKey: ["agenda-atrasados"] });
     }).catch(() => {});
-    supabase.rpc("atualizar_meta_questoes_diaria" as any, { p_user_id: user.id })
+    Promise.resolve(supabase.rpc("atualizar_meta_questoes_diaria" as any, { p_user_id: user.id }))
       .then(() => qc.invalidateQueries({ queryKey: ["questoes-hoje"] }))
       .catch(() => {});
   }, [user?.id, profile?.meta_topicos_dia]);
