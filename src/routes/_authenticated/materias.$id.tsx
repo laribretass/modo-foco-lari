@@ -12,11 +12,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Plus, ChevronDown, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, ChevronDown, Trash2, GitBranch, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { progressoTopico, pctAcerto, proximaAcao, type Topico, type Disciplina } from "@/lib/estudos";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { PrerequisitosDialog } from "@/components/PrerequisitosDialog";
+
+type TopicoExt = Topico & { dominado?: boolean; ordem_didatica?: number };
 
 export const Route = createFileRoute("/_authenticated/materias/$id")({ component: MateriaDetail });
 
