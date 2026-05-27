@@ -727,6 +727,15 @@ export type Database = {
           revisao2_agendada_para: string | null
           revisao2_data: string | null
           revisao2_feita: boolean
+          revisao3_acertos: number
+          revisao3_data: string | null
+          revisao3_feita: boolean
+          revisao4_acertos: number
+          revisao4_data: string | null
+          revisao4_feita: boolean
+          revisao5_acertos: number
+          revisao5_data: string | null
+          revisao5_feita: boolean
           subtema: string | null
           tema: string
           teoria_data: string | null
@@ -762,6 +771,15 @@ export type Database = {
           revisao2_agendada_para?: string | null
           revisao2_data?: string | null
           revisao2_feita?: boolean
+          revisao3_acertos?: number
+          revisao3_data?: string | null
+          revisao3_feita?: boolean
+          revisao4_acertos?: number
+          revisao4_data?: string | null
+          revisao4_feita?: boolean
+          revisao5_acertos?: number
+          revisao5_data?: string | null
+          revisao5_feita?: boolean
           subtema?: string | null
           tema: string
           teoria_data?: string | null
@@ -797,6 +815,15 @@ export type Database = {
           revisao2_agendada_para?: string | null
           revisao2_data?: string | null
           revisao2_feita?: boolean
+          revisao3_acertos?: number
+          revisao3_data?: string | null
+          revisao3_feita?: boolean
+          revisao4_acertos?: number
+          revisao4_data?: string | null
+          revisao4_feita?: boolean
+          revisao5_acertos?: number
+          revisao5_data?: string | null
+          revisao5_feita?: boolean
           subtema?: string | null
           tema?: string
           teoria_data?: string | null
