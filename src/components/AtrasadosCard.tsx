@@ -112,6 +112,9 @@ export function AtrasadosCard({ disciplinas }: { disciplinas: Disciplina[] }) {
             Em atraso <span className="text-muted-foreground font-normal">· {atrasados.length}</span>
           </h3>
         </div>
+        <p className="text-[11px] text-muted-foreground -mt-1">
+          Primeiro foque no plano de hoje. Estes não contam pra meta.
+        </p>
         <div className="space-y-1.5">
           {visiveis.map((item) => {
             const d = discMap.get(item.disciplina_id);
