@@ -18,6 +18,7 @@ import { Route as AuthenticatedRedacaoRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedProgressoRouteImport } from './routes/_authenticated/progresso'
 import { Route as AuthenticatedMateriasRouteImport } from './routes/_authenticated/materias'
 import { Route as AuthenticatedGradeRouteImport } from './routes/_authenticated/grade'
+import { Route as AuthenticatedCronogramaRouteImport } from './routes/_authenticated/cronograma'
 import { Route as AuthenticatedCoragemRouteImport } from './routes/_authenticated/coragem'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedMateriasIndexRouteImport } from './routes/_authenticated/materias.index'
@@ -70,6 +71,11 @@ const AuthenticatedGradeRoute = AuthenticatedGradeRouteImport.update({
   path: '/grade',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCronogramaRoute = AuthenticatedCronogramaRouteImport.update({
+  id: '/cronograma',
+  path: '/cronograma',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedCoragemRoute = AuthenticatedCoragemRouteImport.update({
   id: '/coragem',
   path: '/coragem',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/coragem': typeof AuthenticatedCoragemRoute
+  '/cronograma': typeof AuthenticatedCronogramaRoute
   '/grade': typeof AuthenticatedGradeRoute
   '/materias': typeof AuthenticatedMateriasRouteWithChildren
   '/progresso': typeof AuthenticatedProgressoRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/coragem': typeof AuthenticatedCoragemRoute
+  '/cronograma': typeof AuthenticatedCronogramaRoute
   '/grade': typeof AuthenticatedGradeRoute
   '/progresso': typeof AuthenticatedProgressoRoute
   '/redacao': typeof AuthenticatedRedacaoRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/coragem': typeof AuthenticatedCoragemRoute
+  '/_authenticated/cronograma': typeof AuthenticatedCronogramaRoute
   '/_authenticated/grade': typeof AuthenticatedGradeRoute
   '/_authenticated/materias': typeof AuthenticatedMateriasRouteWithChildren
   '/_authenticated/progresso': typeof AuthenticatedProgressoRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/configuracoes'
     | '/coragem'
+    | '/cronograma'
     | '/grade'
     | '/materias'
     | '/progresso'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/configuracoes'
     | '/coragem'
+    | '/cronograma'
     | '/grade'
     | '/progresso'
     | '/redacao'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/configuracoes'
     | '/_authenticated/coragem'
+    | '/_authenticated/cronograma'
     | '/_authenticated/grade'
     | '/_authenticated/materias'
     | '/_authenticated/progresso'
@@ -276,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGradeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/cronograma': {
+      id: '/_authenticated/cronograma'
+      path: '/cronograma'
+      fullPath: '/cronograma'
+      preLoaderRoute: typeof AuthenticatedCronogramaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/coragem': {
       id: '/_authenticated/coragem'
       path: '/coragem'
@@ -354,6 +373,7 @@ const AuthenticatedMateriasRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedCoragemRoute: typeof AuthenticatedCoragemRoute
+  AuthenticatedCronogramaRoute: typeof AuthenticatedCronogramaRoute
   AuthenticatedGradeRoute: typeof AuthenticatedGradeRoute
   AuthenticatedMateriasRoute: typeof AuthenticatedMateriasRouteWithChildren
   AuthenticatedProgressoRoute: typeof AuthenticatedProgressoRoute
@@ -366,6 +386,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedCoragemRoute: AuthenticatedCoragemRoute,
+  AuthenticatedCronogramaRoute: AuthenticatedCronogramaRoute,
   AuthenticatedGradeRoute: AuthenticatedGradeRoute,
   AuthenticatedMateriasRoute: AuthenticatedMateriasRouteWithChildren,
   AuthenticatedProgressoRoute: AuthenticatedProgressoRoute,
