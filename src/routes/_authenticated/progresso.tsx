@@ -87,6 +87,22 @@ function ProgressoPage() {
         <KPI icon={Flame} label="Sessões (7d)" value={ultimos7.reduce((s, d) => s + d.sessoes, 0)} color="text-orange-500" />
       </div>
 
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+            <Layers className="w-5 h-5" />
+          </div>
+          <div className="flex-1 text-sm">
+            <div className="font-semibold">
+              Anki: {ankiStreak} {ankiStreak === 1 ? "dia seguido" : "dias seguidos"} <Flame className="w-4 h-4 inline text-orange-500" />
+            </div>
+            <div className="text-xs text-muted-foreground">{ankiAderencia}% de aderência este mês</div>
+          </div>
+        </CardContent>
+      </Card>
+
+
+
       <Card>
         <CardHeader><CardTitle className="text-base">Atividade — últimos 7 dias</CardTitle></CardHeader>
         <CardContent>
