@@ -382,6 +382,8 @@ export type Database = {
           id: string
           meta_acerto_pct: number
           meta_diaria_questoes: number
+          meta_questoes_automatica: boolean
+          meta_questoes_dia: number
           meta_topicos_dia: number
           modo_atraso: string | null
           nivel_dedicacao: string | null
@@ -399,6 +401,8 @@ export type Database = {
           id: string
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
+          meta_questoes_automatica?: boolean
+          meta_questoes_dia?: number
           meta_topicos_dia?: number
           modo_atraso?: string | null
           nivel_dedicacao?: string | null
@@ -416,6 +420,8 @@ export type Database = {
           id?: string
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
+          meta_questoes_automatica?: boolean
+          meta_questoes_dia?: number
           meta_topicos_dia?: number
           modo_atraso?: string | null
           nivel_dedicacao?: string | null
@@ -605,6 +611,60 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessoes_questoes: {
+        Row: {
+          created_at: string
+          data: string
+          hora: string
+          id: number
+          observacao: string | null
+          questoes_acertos: number
+          questoes_feitas: number
+          revisao_id: number | null
+          topico_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          hora?: string
+          id?: number
+          observacao?: string | null
+          questoes_acertos: number
+          questoes_feitas: number
+          revisao_id?: number | null
+          topico_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          hora?: string
+          id?: number
+          observacao?: string | null
+          questoes_acertos?: number
+          questoes_feitas?: number
+          revisao_id?: number | null
+          topico_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessoes_questoes_revisao_id_fkey"
+            columns: ["revisao_id"]
+            isOneToOne: false
+            referencedRelation: "revisoes_agendadas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessoes_questoes_topico_id_fkey"
+            columns: ["topico_id"]
+            isOneToOne: false
+            referencedRelation: "topicos"
             referencedColumns: ["id"]
           },
         ]
@@ -858,6 +918,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      atualizar_meta_questoes_diaria: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       atualizar_status_dominado: {
         Args: { p_topico_id: number }
         Returns: undefined
@@ -865,6 +929,10 @@ export type Database = {
       atualizar_status_revisoes: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      calcular_meta_questoes_automatica: {
+        Args: { p_user_id: string }
+        Returns: number
       }
       calcular_status_cronograma: {
         Args: { p_user_id: string }
@@ -913,6 +981,16 @@ export type Database = {
       popular_prerequisitos_user: {
         Args: { p_user_id: string }
         Returns: number
+      }
+      questoes_de_hoje: {
+        Args: { p_user_id: string }
+        Returns: {
+          meta_dia: number
+          pct_meta: number
+          questoes_acertos: number
+          questoes_feitas: number
+          sessoes_realizadas: number
+        }[]
       }
       sortear_repertorio_dia: { Args: { p_user_id: string }; Returns: number }
       topico_esta_dominado: { Args: { p_topico_id: number }; Returns: boolean }
