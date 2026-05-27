@@ -335,9 +335,6 @@ function PlanoItem({
             {topico?.subtema && (
               <div className="text-[11px] text-muted-foreground truncate">{topico.subtema}</div>
             )}
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Próximo: <span className="font-semibold text-foreground">{proxima}</span>
-            </div>
           </div>
 
           <div className="flex flex-col gap-1 shrink-0">
