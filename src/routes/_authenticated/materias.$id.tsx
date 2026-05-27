@@ -88,13 +88,20 @@ function MateriaDetail() {
         <ArrowLeft className="w-4 h-4 mr-1" /> Matérias
       </Link>
       {disciplina && (
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
             <div className="text-xs text-muted-foreground">{disciplina.area}</div>
-            <h1 className="text-2xl font-display font-bold" style={{ color: disciplina.cor }}>{disciplina.nome}</h1>
+            <h1 className="text-2xl font-display font-bold truncate" style={{ color: disciplina.cor }}>{disciplina.nome}</h1>
             <div className="text-sm text-muted-foreground mt-1">{topicos?.length ?? 0} tópicos</div>
           </div>
-          <AddTopicoDialog onSubmit={(v) => addTopico.mutate(v)} />
+          <div className="flex items-center gap-2 shrink-0">
+            <Link to="/materias/$id/sequencia" params={{ id }}>
+              <Button variant="outline" size="sm">
+                <GitBranch className="w-3.5 h-3.5 mr-1" /> Sequência
+              </Button>
+            </Link>
+            <AddTopicoDialog onSubmit={(v) => addTopico.mutate(v)} />
+          </div>
         </div>
       )}
 
@@ -104,13 +111,23 @@ function MateriaDetail() {
             Nenhum tópico ainda. Toque em "+" para adicionar.
           </CardContent></Card>
         )}
-        {topicos?.map((t) => <TopicoRow key={t.id} topico={t} cor={disciplina?.cor ?? "#888"} />)}
+        {topicos?.map((t) => (
+          <TopicoRow
+            key={t.id}
+            topico={t}
+            cor={disciplina?.cor ?? "#888"}
+            disciplinaId={discId}
+            temPendente={pendentesIds?.has(t.id) ?? false}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-function TopicoRow({ topico, cor }: { topico: Topico; cor: string }) {
+function TopicoRow({
+  topico, cor, disciplinaId, temPendente,
+}: { topico: TopicoExt; cor: string; disciplinaId: number; temPendente: boolean }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const prog = progressoTopico(topico);
