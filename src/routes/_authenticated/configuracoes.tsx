@@ -10,7 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { LogOut, Moon, Sun, Bell, Target } from "lucide-react";
+import { LogOut, Moon, Sun, Bell, Target, CalendarDays } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({ component: ConfigPage });
 
@@ -145,6 +146,18 @@ function ConfigPage() {
           <Button onClick={() => saveMetaDiaria.mutate()} disabled={saveMetaDiaria.isPending}>Salvar</Button>
         </CardContent>
       </Card>
+      <Card>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><CalendarDays className="w-4 h-4" /> Prova e Cronograma</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Configure data da prova, modo de atraso e veja suas 3 fases.
+          </p>
+          <Button asChild variant="outline" className="w-full">
+            <Link to="/cronograma">Abrir cronograma</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardHeader><CardTitle className="text-base flex items-center gap-2"><Bell className="w-4 h-4" /> Notificações</CardTitle></CardHeader>
