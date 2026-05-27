@@ -23,6 +23,7 @@ const bottomTabs = [
 ];
 
 const moreItems = [
+  { to: "/revisoes", label: "Revisões", icon: RotateCcw },
   { to: "/grade", label: "Grade Semanal", icon: Calendar },
   { to: "/redacao", label: "Redação", icon: PenLine },
   { to: "/repertorios", label: "Meus Repertórios", icon: Lightbulb },
