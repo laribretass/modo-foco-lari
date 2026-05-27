@@ -644,6 +644,8 @@ export type Database = {
         Args: { p_data: string; p_user: string }
         Returns: number
       }
+      sortear_repertorio_dia: { Args: { p_user_id: string }; Returns: number }
+      trocar_repertorio_dia: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never
