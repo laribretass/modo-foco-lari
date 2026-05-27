@@ -18,6 +18,7 @@ import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PrerequisitosDialog } from "@/components/PrerequisitosDialog";
+import { RegistrarSessaoQuestoes } from "@/components/RegistrarSessaoQuestoes";
 
 type TopicoExt = Topico & {
   dominado?: boolean;
@@ -263,18 +264,16 @@ function TopicoRow({
               <Checkpoint label="Flashcards" value={topico.flashcards_feitos}
                 onChange={(v) => update.mutate({ flashcards_feitos: v })} />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs">Questões feitas</Label>
-                <Input type="number" min={0} defaultValue={topico.questoes_feitas}
-                  onBlur={(e) => update.mutate({ questoes_feitas: Number(e.target.value) })} />
-              </div>
-              <div>
-                <Label className="text-xs">Acertos</Label>
-                <Input type="number" min={0} defaultValue={topico.questoes_acertos}
-                  onBlur={(e) => update.mutate({ questoes_acertos: Number(e.target.value) })} />
+            <div className="rounded-md border p-2 text-xs bg-muted/30">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total acumulado</span>
+                <span className="font-semibold tabular-nums">
+                  {topico.questoes_feitas} questões
+                  {pct !== null && ` · ${pct}% acerto`}
+                </span>
               </div>
             </div>
+            <RegistrarSessaoQuestoes topicoId={topico.id} teoriaFeita={topico.teoria_feita} />
             <div>
               <Label className="text-xs">Recorrência</Label>
               <Select value={topico.recorrencia} onValueChange={(v) => update.mutate({ recorrencia: v })}>

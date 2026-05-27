@@ -16,6 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { AtrasadosCard } from "@/components/AtrasadosCard";
 import { AnkiCard } from "@/components/AnkiCard";
+import { QuestoesHojeCard } from "@/components/QuestoesHojeCard";
 import { RepertorioCard } from "@/components/RepertorioCard";
 import { PlanoDoDia } from "@/components/PlanoDoDia";
 import { CorridaProEnemCard } from "@/components/CorridaProEnemCard";
@@ -48,6 +49,9 @@ function HojePage() {
       qc.invalidateQueries({ queryKey: ["plano-dia"] });
       qc.invalidateQueries({ queryKey: ["agenda-atrasados"] });
     }).catch(() => {});
+    Promise.resolve(supabase.rpc("atualizar_meta_questoes_diaria" as any, { p_user_id: user.id }))
+      .then(() => qc.invalidateQueries({ queryKey: ["questoes-hoje"] }))
+      .catch(() => {});
   }, [user?.id, profile?.meta_topicos_dia]);
 
   useAnkiLembrete();
@@ -108,6 +112,8 @@ function HojePage() {
         <StatCard icon={CheckCircle2} label="Sessões" value={sessoesHojeCount} color="text-success" />
         <StatCard icon={AlertCircle} label="Revisões" value={revisoesVencidas} color={revisoesVencidas > 0 ? "text-destructive" : "text-muted-foreground"} />
       </div>
+
+      <QuestoesHojeCard />
 
       <AnkiCard />
       <RepertorioCard />
