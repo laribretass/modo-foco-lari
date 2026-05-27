@@ -142,7 +142,10 @@ function HojePage() {
 
       <CoachCard />
 
+      <AnkiCard />
+
       <AtrasadosCard disciplinas={disciplinas ?? []} />
+
 
 
       {revisoesVencidas > 0 && (
