@@ -21,6 +21,7 @@ import { Route as AuthenticatedCoragemRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedMateriasIndexRouteImport } from './routes/_authenticated/materias.index'
 import { Route as AuthenticatedMateriasIdRouteImport } from './routes/_authenticated/materias.$id'
+import { Route as ApiPublicCronPopularAgendasRouteImport } from './routes/api/public/cron/popular-agendas'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -83,6 +84,12 @@ const AuthenticatedMateriasIdRoute = AuthenticatedMateriasIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedMateriasRoute,
 } as any)
+const ApiPublicCronPopularAgendasRoute =
+  ApiPublicCronPopularAgendasRouteImport.update({
+    id: '/api/public/cron/popular-agendas',
+    path: '/api/public/cron/popular-agendas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/simulados': typeof AuthenticatedSimuladosRoute
   '/materias/$id': typeof AuthenticatedMateriasIdRoute
   '/materias/': typeof AuthenticatedMateriasIndexRoute
+  '/api/public/cron/popular-agendas': typeof ApiPublicCronPopularAgendasRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -108,6 +116,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/materias/$id': typeof AuthenticatedMateriasIdRoute
   '/materias': typeof AuthenticatedMateriasIndexRoute
+  '/api/public/cron/popular-agendas': typeof ApiPublicCronPopularAgendasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -123,6 +132,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/materias/$id': typeof AuthenticatedMateriasIdRoute
   '/_authenticated/materias/': typeof AuthenticatedMateriasIndexRoute
+  '/api/public/cron/popular-agendas': typeof ApiPublicCronPopularAgendasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/simulados'
     | '/materias/$id'
     | '/materias/'
+    | '/api/public/cron/popular-agendas'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/'
     | '/materias/$id'
     | '/materias'
+    | '/api/public/cron/popular-agendas'
   id:
     | '__root__'
     | '/_authenticated'
@@ -164,11 +176,13 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/materias/$id'
     | '/_authenticated/materias/'
+    | '/api/public/cron/popular-agendas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiPublicCronPopularAgendasRoute: typeof ApiPublicCronPopularAgendasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -257,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMateriasIdRouteImport
       parentRoute: typeof AuthenticatedMateriasRoute
     }
+    '/api/public/cron/popular-agendas': {
+      id: '/api/public/cron/popular-agendas'
+      path: '/api/public/cron/popular-agendas'
+      fullPath: '/api/public/cron/popular-agendas'
+      preLoaderRoute: typeof ApiPublicCronPopularAgendasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -304,6 +325,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiPublicCronPopularAgendasRoute: ApiPublicCronPopularAgendasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
