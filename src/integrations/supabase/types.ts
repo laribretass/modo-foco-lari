@@ -672,6 +672,7 @@ export type Database = {
           id: number
           mapeamento_data: string | null
           mapeamento_feito: boolean
+          modulo: string | null
           observacoes: string | null
           ordem_didatica: number
           pre_aula_acertos: number
@@ -703,6 +704,7 @@ export type Database = {
           id?: number
           mapeamento_data?: string | null
           mapeamento_feito?: boolean
+          modulo?: string | null
           observacoes?: string | null
           ordem_didatica?: number
           pre_aula_acertos?: number
@@ -734,6 +736,7 @@ export type Database = {
           id?: number
           mapeamento_data?: string | null
           mapeamento_feito?: boolean
+          modulo?: string | null
           observacoes?: string | null
           ordem_didatica?: number
           pre_aula_acertos?: number
