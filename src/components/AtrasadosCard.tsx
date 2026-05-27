@@ -52,7 +52,14 @@ export function AtrasadosCard({ disciplinas }: { disciplinas: Disciplina[] }) {
         .eq("status", "pendente")
         .lt("data_prevista", hoje)
         .order("data_prevista", { ascending: true });
-      return (data ?? []) as AgendaItem[];
+      const ids = Array.from(new Set((data ?? []).map((a: any) => a.topico_id)));
+      let concluidos = new Set<number>();
+      if (ids.length > 0) {
+        const { data: tops } = await supabase.from("topicos")
+          .select("id, concluido_em").in("id", ids).not("concluido_em", "is", null);
+        concluidos = new Set((tops ?? []).map((t: any) => t.id));
+      }
+      return ((data ?? []) as AgendaItem[]).filter((a) => !concluidos.has(a.topico_id));
     },
     enabled: !!user,
   });
