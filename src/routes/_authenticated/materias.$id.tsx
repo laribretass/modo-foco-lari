@@ -243,6 +243,13 @@ function TopicoRow({
           </div>
         </CollapsibleContent>
       </Collapsible>
+      <PrerequisitosDialog
+        open={prereqOpen}
+        onOpenChange={setPrereqOpen}
+        topicoId={topico.id}
+        topicoTema={topico.tema}
+        disciplinaId={disciplinaId}
+      />
     </Card>
   );
 }
