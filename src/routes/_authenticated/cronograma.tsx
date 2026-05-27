@@ -157,9 +157,21 @@ function CronogramaPage() {
               </label>
             </RadioGroup>
           </div>
+          <div>
+            <Label>Horas por semana</Label>
+            <RadioGroup value={dedicacao} onValueChange={setDedicacao} className="grid grid-cols-2 gap-2 mt-2">
+              {["20h","30h","40h","50h"].map(v => (
+                <label key={v} className="flex items-center gap-2 text-sm cursor-pointer border rounded-md px-3 py-2">
+                  <RadioGroupItem value={v} />
+                  <span>{v}/semana</span>
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
           <Button onClick={() => save.mutate()} disabled={save.isPending} className="w-full">
             Recalcular cronograma
           </Button>
+
         </CardContent>
       </Card>
     </div>
