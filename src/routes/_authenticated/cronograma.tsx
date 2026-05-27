@@ -22,11 +22,12 @@ function CronogramaPage() {
   const { data: profile } = useQuery({
     queryKey: ["profile-prova", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("data_prova, modo_atraso").eq("id", user!.id).single();
+      const { data } = await supabase.from("profiles").select("data_prova, modo_atraso, nivel_dedicacao").eq("id", user!.id).single();
       return data as any;
     },
     enabled: !!user,
   });
+
 
   const { data: fases } = useQuery({
     queryKey: ["cronograma-fases", user?.id],
