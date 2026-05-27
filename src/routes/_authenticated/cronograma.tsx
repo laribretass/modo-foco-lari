@@ -49,10 +49,12 @@ function CronogramaPage() {
 
   const [dataProva, setDataProva] = useState("");
   const [modo, setModo] = useState<"rigoroso"|"compreensivo">("rigoroso");
+  const [dedicacao, setDedicacao] = useState<string>("40h");
   useEffect(() => {
     if (profile) {
       setDataProva(profile.data_prova ?? "");
       setModo(profile.modo_atraso ?? "rigoroso");
+      setDedicacao(profile.nivel_dedicacao ?? "40h");
     }
   }, [profile]);
 
@@ -60,7 +62,7 @@ function CronogramaPage() {
     mutationFn: async () => {
       if (!dataProva) throw new Error("Defina a data da prova");
       const { error } = await supabase.from("profiles")
-        .update({ data_prova: dataProva, modo_atraso: modo } as any)
+        .update({ data_prova: dataProva, modo_atraso: modo, nivel_dedicacao: dedicacao } as any)
         .eq("id", user!.id);
       if (error) throw error;
       const { error: e2 } = await supabase.rpc("inicializar_cronograma", { p_user_id: user!.id, p_data_prova: dataProva });
@@ -74,6 +76,7 @@ function CronogramaPage() {
     },
     onError: (e: any) => toast.error(e.message ?? "Erro"),
   });
+
 
   const hoje = new Date();
   const faseAtualNum = status?.fase_atual_numero ?? 1;
