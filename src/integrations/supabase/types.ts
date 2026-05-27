@@ -214,6 +214,48 @@ export type Database = {
           },
         ]
       }
+      cronograma_fases: {
+        Row: {
+          concluida: boolean
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          descricao: string | null
+          id: number
+          meta_topicos_atingidos: number
+          meta_topicos_total: number
+          nome: string
+          numero_fase: number
+          user_id: string
+        }
+        Insert: {
+          concluida?: boolean
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          descricao?: string | null
+          id?: number
+          meta_topicos_atingidos?: number
+          meta_topicos_total?: number
+          nome: string
+          numero_fase: number
+          user_id: string
+        }
+        Update: {
+          concluida?: boolean
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          descricao?: string | null
+          id?: number
+          meta_topicos_atingidos?: number
+          meta_topicos_total?: number
+          nome?: string
+          numero_fase?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       disciplinas: {
         Row: {
           area: string
@@ -336,12 +378,16 @@ export type Database = {
           anki_lembrete_ativo: boolean
           anki_lembrete_horario: string
           created_at: string
+          data_prova: string | null
           id: string
           meta_acerto_pct: number
           meta_diaria_questoes: number
           meta_topicos_dia: number
+          modo_atraso: string | null
+          nivel_dedicacao: string | null
           nivel_meta: string
           nome: string | null
+          objetivo_cobertura: string | null
           repertorios_trocas_count: number
           repertorios_trocas_data: string | null
         }
@@ -349,12 +395,16 @@ export type Database = {
           anki_lembrete_ativo?: boolean
           anki_lembrete_horario?: string
           created_at?: string
+          data_prova?: string | null
           id: string
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
           meta_topicos_dia?: number
+          modo_atraso?: string | null
+          nivel_dedicacao?: string | null
           nivel_meta?: string
           nome?: string | null
+          objetivo_cobertura?: string | null
           repertorios_trocas_count?: number
           repertorios_trocas_data?: string | null
         }
@@ -362,12 +412,16 @@ export type Database = {
           anki_lembrete_ativo?: boolean
           anki_lembrete_horario?: string
           created_at?: string
+          data_prova?: string | null
           id?: string
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
           meta_topicos_dia?: number
+          modo_atraso?: string | null
+          nivel_dedicacao?: string | null
           nivel_meta?: string
           nome?: string | null
+          objetivo_cobertura?: string | null
           repertorios_trocas_count?: number
           repertorios_trocas_data?: string | null
         }
@@ -725,11 +779,38 @@ export type Database = {
     }
     Functions: {
       adicionar_topico_extra: { Args: { p_user_id: string }; Returns: number }
+      ajustar_meta_diaria_automatica: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       atualizar_status_dominado: {
         Args: { p_topico_id: number }
         Returns: undefined
       }
+      calcular_status_cronograma: {
+        Args: { p_user_id: string }
+        Returns: {
+          dias_atraso: number
+          dias_restantes_fase: number
+          dias_restantes_prova: number
+          faltam: number
+          fase_atual_nome: string
+          fase_atual_numero: number
+          fase_data_fim: string
+          fase_data_inicio: string
+          feitos: number
+          mensagem: string
+          meta_total: number
+          severidade: string
+          topicos_dia_necessario: number
+          topicos_dia_ritmo_atual: number
+        }[]
+      }
       garantir_plano_dia: { Args: { p_user_id: string }; Returns: undefined }
+      inicializar_cronograma: {
+        Args: { p_data_prova: string; p_user_id: string }
+        Returns: undefined
+      }
       listar_prerequisitos_com_progresso: {
         Args: { p_topico_id: number; p_user_id: string }
         Returns: {

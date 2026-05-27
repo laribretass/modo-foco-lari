@@ -18,6 +18,8 @@ import { AtrasadosCard } from "@/components/AtrasadosCard";
 import { AnkiCard } from "@/components/AnkiCard";
 import { RepertorioCard } from "@/components/RepertorioCard";
 import { PlanoDoDia } from "@/components/PlanoDoDia";
+import { CorridaProEnemCard } from "@/components/CorridaProEnemCard";
+import { AlertasEstrategicos } from "@/components/AlertasEstrategicos";
 import { ensureAgendaHoje } from "@/lib/agenda.functions";
 import { useAnkiLembrete } from "@/hooks/use-anki-lembrete";
 import { useQueryClient } from "@tanstack/react-query";
@@ -96,6 +98,9 @@ function HojePage() {
           Olá, {profile?.nome ?? "estudante"} 👋
         </h1>
       </motion.div>
+
+      <AlertasEstrategicos />
+      <CorridaProEnemCard />
 
       <div className="grid grid-cols-4 gap-2">
         <StatCard icon={Flame} label="Streak" value={`${streak}d`} color="text-orange-500" />
