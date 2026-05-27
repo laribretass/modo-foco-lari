@@ -447,6 +447,33 @@ export type Database = {
           },
         ]
       }
+      sequencia_didatica_padrao: {
+        Row: {
+          created_at: string
+          depende_de: string[]
+          disciplina_slug: string
+          id: number
+          ordem: number
+          tema: string
+        }
+        Insert: {
+          created_at?: string
+          depende_de?: string[]
+          disciplina_slug: string
+          id?: number
+          ordem: number
+          tema: string
+        }
+        Update: {
+          created_at?: string
+          depende_de?: string[]
+          disciplina_slug?: string
+          id?: number
+          ordem?: number
+          tema?: string
+        }
+        Relationships: []
+      }
       sessoes_estudo: {
         Row: {
           concluido: boolean
@@ -542,15 +569,57 @@ export type Database = {
           },
         ]
       }
+      topico_prerequisitos: {
+        Row: {
+          created_at: string
+          id: number
+          prerequisito_topico_id: number
+          topico_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          prerequisito_topico_id: number
+          topico_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          prerequisito_topico_id?: number
+          topico_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topico_prerequisitos_prerequisito_topico_id_fkey"
+            columns: ["prerequisito_topico_id"]
+            isOneToOne: false
+            referencedRelation: "topicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "topico_prerequisitos_topico_id_fkey"
+            columns: ["topico_id"]
+            isOneToOne: false
+            referencedRelation: "topicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       topicos: {
         Row: {
           created_at: string
           disciplina_id: number
+          dominado: boolean
+          dominado_em: string | null
           flashcards_feitos: boolean
           id: number
           mapeamento_data: string | null
           mapeamento_feito: boolean
           observacoes: string | null
+          ordem_didatica: number
           pre_aula_acertos: number
           pre_aula_feita: boolean
           questoes_acertos: number
@@ -574,11 +643,14 @@ export type Database = {
         Insert: {
           created_at?: string
           disciplina_id: number
+          dominado?: boolean
+          dominado_em?: string | null
           flashcards_feitos?: boolean
           id?: number
           mapeamento_data?: string | null
           mapeamento_feito?: boolean
           observacoes?: string | null
+          ordem_didatica?: number
           pre_aula_acertos?: number
           pre_aula_feita?: boolean
           questoes_acertos?: number
@@ -602,11 +674,14 @@ export type Database = {
         Update: {
           created_at?: string
           disciplina_id?: number
+          dominado?: boolean
+          dominado_em?: string | null
           flashcards_feitos?: boolean
           id?: number
           mapeamento_data?: string | null
           mapeamento_feito?: boolean
           observacoes?: string | null
+          ordem_didatica?: number
           pre_aula_acertos?: number
           pre_aula_feita?: boolean
           questoes_acertos?: number
@@ -650,13 +725,35 @@ export type Database = {
     }
     Functions: {
       adicionar_topico_extra: { Args: { p_user_id: string }; Returns: number }
+      atualizar_status_dominado: {
+        Args: { p_topico_id: number }
+        Returns: undefined
+      }
       garantir_plano_dia: { Args: { p_user_id: string }; Returns: undefined }
+      listar_prerequisitos_com_progresso: {
+        Args: { p_topico_id: number; p_user_id: string }
+        Returns: {
+          dominado: boolean
+          pct_acertos: number
+          pct_consolidacao: number
+          prerequisito_id: number
+          prerequisito_subtema: string
+          prerequisito_tema: string
+          proxima_acao: string
+        }[]
+      }
       popular_agenda_dia: {
         Args: { p_data: string; p_user: string }
         Returns: number
       }
+      popular_prerequisitos_user: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       sortear_repertorio_dia: { Args: { p_user_id: string }; Returns: number }
+      topico_esta_dominado: { Args: { p_topico_id: number }; Returns: boolean }
       trocar_repertorio_dia: { Args: { p_user_id: string }; Returns: number }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
