@@ -130,7 +130,29 @@ function ProgressoPage() {
         </CardContent>
       </Card>
 
-
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center justify-between">
+            <span>Meta cumprida — últimos 30 dias</span>
+            <span className="text-xs font-normal text-muted-foreground">{diasCumpridos}/30</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-10 gap-1.5">
+            {heatmap.map((h) => (
+              <div
+                key={h.dStr}
+                title={`${h.label} — ${h.cumprida ? "meta cumprida" : "não cumprida"}`}
+                className={`aspect-square rounded-sm ${h.cumprida ? "bg-success" : "bg-muted"}`}
+              />
+            ))}
+          </div>
+          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-sm bg-success" /> cumprida</div>
+            <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-sm bg-muted" /> sem meta</div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader><CardTitle className="text-base">Atividade — últimos 7 dias</CardTitle></CardHeader>
