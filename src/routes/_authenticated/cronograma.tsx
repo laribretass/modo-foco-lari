@@ -22,11 +22,12 @@ function CronogramaPage() {
   const { data: profile } = useQuery({
     queryKey: ["profile-prova", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("data_prova, modo_atraso").eq("id", user!.id).single();
+      const { data } = await supabase.from("profiles").select("data_prova, modo_atraso, nivel_dedicacao").eq("id", user!.id).single();
       return data as any;
     },
     enabled: !!user,
   });
+
 
   const { data: fases } = useQuery({
     queryKey: ["cronograma-fases", user?.id],
@@ -48,10 +49,12 @@ function CronogramaPage() {
 
   const [dataProva, setDataProva] = useState("");
   const [modo, setModo] = useState<"rigoroso"|"compreensivo">("rigoroso");
+  const [dedicacao, setDedicacao] = useState<string>("40h");
   useEffect(() => {
     if (profile) {
       setDataProva(profile.data_prova ?? "");
       setModo(profile.modo_atraso ?? "rigoroso");
+      setDedicacao(profile.nivel_dedicacao ?? "40h");
     }
   }, [profile]);
 
@@ -59,7 +62,7 @@ function CronogramaPage() {
     mutationFn: async () => {
       if (!dataProva) throw new Error("Defina a data da prova");
       const { error } = await supabase.from("profiles")
-        .update({ data_prova: dataProva, modo_atraso: modo } as any)
+        .update({ data_prova: dataProva, modo_atraso: modo, nivel_dedicacao: dedicacao } as any)
         .eq("id", user!.id);
       if (error) throw error;
       const { error: e2 } = await supabase.rpc("inicializar_cronograma", { p_user_id: user!.id, p_data_prova: dataProva });
@@ -73,6 +76,7 @@ function CronogramaPage() {
     },
     onError: (e: any) => toast.error(e.message ?? "Erro"),
   });
+
 
   const hoje = new Date();
   const faseAtualNum = status?.fase_atual_numero ?? 1;
@@ -153,9 +157,21 @@ function CronogramaPage() {
               </label>
             </RadioGroup>
           </div>
+          <div>
+            <Label>Horas por semana</Label>
+            <RadioGroup value={dedicacao} onValueChange={setDedicacao} className="grid grid-cols-2 gap-2 mt-2">
+              {["20h","30h","40h","50h"].map(v => (
+                <label key={v} className="flex items-center gap-2 text-sm cursor-pointer border rounded-md px-3 py-2">
+                  <RadioGroupItem value={v} />
+                  <span>{v}/semana</span>
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
           <Button onClick={() => save.mutate()} disabled={save.isPending} className="w-full">
             Recalcular cronograma
           </Button>
+
         </CardContent>
       </Card>
     </div>
