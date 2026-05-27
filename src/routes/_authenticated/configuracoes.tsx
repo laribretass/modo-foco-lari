@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { LogOut, Moon, Sun, Bell } from "lucide-react";
+import { LogOut, Moon, Sun, Bell, Target } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({ component: ConfigPage });
 
@@ -42,11 +43,15 @@ function ConfigPage() {
   const [acerto, setAcerto] = useState(70);
   const [ankiAtivo, setAnkiAtivo] = useState(false);
   const [ankiHorario, setAnkiHorario] = useState("20:00");
+  const [nivelMeta, setNivelMeta] = useState<"leve"|"normal"|"intenso"|"personalizado">("normal");
+  const [metaTopicos, setMetaTopicos] = useState(4);
   useEffect(() => {
     if (profile) {
       setNome(profile.nome ?? ""); setMeta(profile.meta_diaria_questoes); setAcerto(profile.meta_acerto_pct);
       setAnkiAtivo((profile as any).anki_lembrete_ativo ?? false);
       setAnkiHorario(String((profile as any).anki_lembrete_horario ?? "20:00").slice(0, 5));
+      setNivelMeta(((profile as any).nivel_meta ?? "normal"));
+      setMetaTopicos((profile as any).meta_topicos_dia ?? 4);
     }
   }, [profile]);
 
@@ -58,6 +63,22 @@ function ConfigPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Salvo"); qc.invalidateQueries({ queryKey: ["profile"] }); },
+  });
+
+  const saveMetaDiaria = useMutation({
+    mutationFn: async () => {
+      const valor = nivelMeta === "leve" ? 2 : nivelMeta === "normal" ? 4 : nivelMeta === "intenso" ? 6 : Math.max(1, Math.min(15, metaTopicos));
+      const { error } = await supabase.from("profiles")
+        .update({ nivel_meta: nivelMeta, meta_topicos_dia: valor } as any)
+        .eq("id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Meta diária atualizada");
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      qc.invalidateQueries({ queryKey: ["plano-dia"] });
+    },
+    onError: (e: any) => toast.error(e.message ?? "Erro"),
   });
 
   const saveAnki = useMutation({
@@ -95,6 +116,33 @@ function ConfigPage() {
         <CardContent className="flex items-center justify-between">
           <div className="flex items-center gap-2">{dark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}<span>Tema escuro</span></div>
           <Switch checked={dark} onCheckedChange={toggleDark} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Target className="w-4 h-4" /> Meta diária</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">Quantos tópicos por dia?</p>
+          <RadioGroup value={nivelMeta} onValueChange={(v) => setNivelMeta(v as any)} className="space-y-2">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <RadioGroupItem value="leve" /> Leve — 2 tópicos
+            </label>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <RadioGroupItem value="normal" /> Normal — 4 tópicos <span className="text-xs text-muted-foreground">(recomendado)</span>
+            </label>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <RadioGroupItem value="intenso" /> Intenso — 6 tópicos
+            </label>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <RadioGroupItem value="personalizado" /> Personalizado
+              {nivelMeta === "personalizado" && (
+                <Input type="number" min={1} max={15} value={metaTopicos}
+                  onChange={(e) => setMetaTopicos(Number(e.target.value))}
+                  className="w-20 h-7 ml-2" />
+              )}
+            </label>
+          </RadioGroup>
+          <Button onClick={() => saveMetaDiaria.mutate()} disabled={saveMetaDiaria.isPending}>Salvar</Button>
         </CardContent>
       </Card>
 

@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           data_prevista: string
           disciplina_id: number
+          faz_parte_meta_dia: boolean
           id: number
           proxima_acao: string
           status: string
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           data_prevista: string
           disciplina_id: number
+          faz_parte_meta_dia?: boolean
           id?: number
           proxima_acao: string
           status?: string
@@ -42,6 +44,7 @@ export type Database = {
           created_at?: string
           data_prevista?: string
           disciplina_id?: number
+          faz_parte_meta_dia?: boolean
           id?: number
           proxima_acao?: string
           status?: string
@@ -336,6 +339,8 @@ export type Database = {
           id: string
           meta_acerto_pct: number
           meta_diaria_questoes: number
+          meta_topicos_dia: number
+          nivel_meta: string
           nome: string | null
           repertorios_trocas_count: number
           repertorios_trocas_data: string | null
@@ -347,6 +352,8 @@ export type Database = {
           id: string
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
+          meta_topicos_dia?: number
+          nivel_meta?: string
           nome?: string | null
           repertorios_trocas_count?: number
           repertorios_trocas_data?: string | null
@@ -358,6 +365,8 @@ export type Database = {
           id?: string
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
+          meta_topicos_dia?: number
+          nivel_meta?: string
           nome?: string | null
           repertorios_trocas_count?: number
           repertorios_trocas_data?: string | null
@@ -640,6 +649,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      adicionar_topico_extra: { Args: { p_user_id: string }; Returns: number }
+      garantir_plano_dia: { Args: { p_user_id: string }; Returns: undefined }
       popular_agenda_dia: {
         Args: { p_data: string; p_user: string }
         Returns: number

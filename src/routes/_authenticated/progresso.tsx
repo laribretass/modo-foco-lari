@@ -47,8 +47,37 @@ function ProgressoPage() {
     },
     enabled: !!user,
   });
+  const { data: agenda30 } = useQuery({
+    queryKey: ["agenda-meta-30d-prog", user?.id],
+    queryFn: async () => {
+      const desde = subDays(new Date(), 29).toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("agenda_diaria")
+        .select("data_prevista, status, faz_parte_meta_dia")
+        .gte("data_prevista", desde)
+        .eq("faz_parte_meta_dia", true);
+      return data ?? [];
+    },
+    enabled: !!user,
+  });
   const ankiStreak = calcAnkiStreak(ankiRev ?? []);
   const ankiAderencia = calcAderenciaMes(ankiRev ?? []);
+
+  // Heatmap meta cumprida últimos 30 dias
+  const metaPorDia = new Map<string, { meta: number; done: number }>();
+  (agenda30 ?? []).forEach((a: any) => {
+    const cur = metaPorDia.get(a.data_prevista) ?? { meta: 0, done: 0 };
+    cur.meta += 1; if (a.status === "concluido") cur.done += 1;
+    metaPorDia.set(a.data_prevista, cur);
+  });
+  const heatmap = Array.from({ length: 30 }).map((_, i) => {
+    const d = subDays(new Date(), 29 - i);
+    const dStr = d.toISOString().slice(0, 10);
+    const v = metaPorDia.get(dStr);
+    const cumprida = v && v.meta > 0 && v.done >= v.meta;
+    return { dStr, cumprida, label: format(d, "dd/MM") };
+  });
+  const diasCumpridos = heatmap.filter((h) => h.cumprida).length;
 
   const totalQuestoes = topicos?.reduce((s, t) => s + t.questoes_feitas, 0) ?? 0;
   const totalAcertos = topicos?.reduce((s, t) => s + t.questoes_acertos, 0) ?? 0;
