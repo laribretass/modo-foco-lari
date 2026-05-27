@@ -47,8 +47,9 @@ export function PlanoDoDia({
     queryFn: async () => {
       const { data, error } = await supabase
         .from("agenda_diaria")
-        .select("*")
+        .select("*, topicos!inner(concluido_em)")
         .eq("data_prevista", hoje)
+        .is("topicos.concluido_em", null)
         .order("id", { ascending: true });
       if (error) throw error;
       return (data ?? []) as AgendaItem[];
