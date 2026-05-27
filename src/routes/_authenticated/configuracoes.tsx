@@ -99,6 +99,34 @@ function ConfigPage() {
       </Card>
 
       <Card>
+        <CardHeader><CardTitle className="text-base flex items-center gap-2"><Bell className="w-4 h-4" /> Notificações</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-medium">Lembrar de fazer Anki</div>
+              <div className="text-xs text-muted-foreground">Aviso diário se você não revisou os flashcards</div>
+            </div>
+            <Switch
+              checked={ankiAtivo}
+              onCheckedChange={(v) => { setAnkiAtivo(v); saveAnki.mutate({ anki_lembrete_ativo: v }); }}
+            />
+          </div>
+          {ankiAtivo && (
+            <div>
+              <Label>Horário do lembrete</Label>
+              <Input
+                type="time"
+                value={ankiHorario}
+                onChange={(e) => setAnkiHorario(e.target.value)}
+                onBlur={() => saveAnki.mutate({ anki_lembrete_horario: ankiHorario })}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+
+      <Card>
         <CardContent className="p-4">
           <Button variant="destructive" className="w-full" onClick={logout}>
             <LogOut className="w-4 h-4 mr-2" /> Sair
