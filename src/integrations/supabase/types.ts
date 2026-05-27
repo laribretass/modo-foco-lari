@@ -337,6 +337,8 @@ export type Database = {
           meta_acerto_pct: number
           meta_diaria_questoes: number
           nome: string | null
+          repertorios_trocas_count: number
+          repertorios_trocas_data: string | null
         }
         Insert: {
           anki_lembrete_ativo?: boolean
@@ -346,6 +348,8 @@ export type Database = {
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
           nome?: string | null
+          repertorios_trocas_count?: number
+          repertorios_trocas_data?: string | null
         }
         Update: {
           anki_lembrete_ativo?: boolean
@@ -355,8 +359,84 @@ export type Database = {
           meta_acerto_pct?: number
           meta_diaria_questoes?: number
           nome?: string | null
+          repertorios_trocas_count?: number
+          repertorios_trocas_data?: string | null
         }
         Relationships: []
+      }
+      repertorios_catalogo: {
+        Row: {
+          ativo: boolean
+          categoria: string
+          created_at: string
+          descricao: string
+          dica_uso: string | null
+          id: number
+          nome: string
+          subtitulo: string | null
+          temas_relacionados: string[] | null
+        }
+        Insert: {
+          ativo?: boolean
+          categoria: string
+          created_at?: string
+          descricao: string
+          dica_uso?: string | null
+          id?: number
+          nome: string
+          subtitulo?: string | null
+          temas_relacionados?: string[] | null
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          descricao?: string
+          dica_uso?: string | null
+          id?: number
+          nome?: string
+          subtitulo?: string | null
+          temas_relacionados?: string[] | null
+        }
+        Relationships: []
+      }
+      repertorios_diarios: {
+        Row: {
+          data: string
+          id: number
+          ja_conhece: boolean
+          repertorio_id: number
+          salvo: boolean
+          user_id: string
+          visto_em: string
+        }
+        Insert: {
+          data?: string
+          id?: number
+          ja_conhece?: boolean
+          repertorio_id: number
+          salvo?: boolean
+          user_id: string
+          visto_em?: string
+        }
+        Update: {
+          data?: string
+          id?: number
+          ja_conhece?: boolean
+          repertorio_id?: number
+          salvo?: boolean
+          user_id?: string
+          visto_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repertorios_diarios_repertorio_id_fkey"
+            columns: ["repertorio_id"]
+            isOneToOne: false
+            referencedRelation: "repertorios_catalogo"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sessoes_estudo: {
         Row: {
