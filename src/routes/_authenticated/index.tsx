@@ -138,6 +138,9 @@ function HojePage() {
 
       <CoachCard />
 
+      <AtrasadosCard disciplinas={disciplinas ?? []} />
+
+
       {revisoesVencidas > 0 && (
         <Link to="/materias">
           <Card className="border-destructive/30 bg-destructive/5 hover:bg-destructive/10 transition-colors">
