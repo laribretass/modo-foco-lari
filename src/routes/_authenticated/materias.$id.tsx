@@ -194,8 +194,14 @@ function TopicoRow({
 
   const [prereqOpen, setPrereqOpen] = useState(false);
 
+  const emRevisao = !!topico.concluido_em;
+
   return (
-    <Card className={topico.dominado ? "border-emerald-500/40" : temPendente ? "border-amber-400/50" : ""}>
+    <Card className={
+      emRevisao ? "border-blue-500/40 bg-blue-500/5"
+      : topico.dominado ? "border-emerald-500/40"
+      : temPendente ? "border-amber-400/50" : ""
+    }>
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger asChild>
           <button className="w-full text-left p-3 flex items-center gap-3 hover:bg-muted/50">
@@ -204,6 +210,11 @@ function TopicoRow({
                 {topico.dominado && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
                 <h3 className="font-medium truncate">{topico.tema}</h3>
                 <Badge variant="outline" className="text-[10px]">{topico.recorrencia}</Badge>
+                {emRevisao && (
+                  <Badge className="bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30 text-[10px]">
+                    EM REVISÃO
+                  </Badge>
+                )}
                 {topico.dominado && (
                   <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[10px]">
                     DOMINADO
@@ -233,16 +244,22 @@ function TopicoRow({
         <CollapsibleContent>
           <div className="p-3 pt-0 space-y-3 border-t">
             <div className="grid grid-cols-2 gap-2 text-sm">
+              <Checkpoint label="Teoria" value={topico.teoria_feita}
+                onChange={(v) => update.mutate({ teoria_feita: v, teoria_data: v ? new Date().toISOString() : null } as any)} />
+              <Checkpoint label="Exercícios" value={!!(topico as any).exercicios_feitos}
+                onChange={(v) => {
+                  update.mutate({ exercicios_feitos: v, exercicios_data: v ? new Date().toISOString() : null } as any, {
+                    onSuccess: () => {
+                      if (v && topico.teoria_feita) {
+                        toast.success("Conteúdo concluído! Revisões agendadas automaticamente 🎯");
+                      }
+                    },
+                  });
+                }} />
               <Checkpoint label="Pré-aula" value={topico.pre_aula_feita}
                 onChange={(v) => update.mutate({ pre_aula_feita: v })} />
-              <Checkpoint label="Teoria" value={topico.teoria_feita}
-                onChange={(v) => update.mutate({ teoria_feita: v, teoria_data: v ? new Date().toISOString() : null })} />
               <Checkpoint label="Mapeamento" value={topico.mapeamento_feito}
                 onChange={(v) => update.mutate({ mapeamento_feito: v, mapeamento_data: v ? new Date().toISOString() : null })} />
-              <Checkpoint label="Revisão 1" value={topico.revisao1_feita}
-                onChange={(v) => update.mutate({ revisao1_feita: v, revisao1_data: v ? new Date().toISOString() : null })} />
-              <Checkpoint label="Revisão 2" value={topico.revisao2_feita}
-                onChange={(v) => update.mutate({ revisao2_feita: v, revisao2_data: v ? new Date().toISOString() : null })} />
               <Checkpoint label="Flashcards" value={topico.flashcards_feitos}
                 onChange={(v) => update.mutate({ flashcards_feitos: v })} />
             </div>
