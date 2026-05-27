@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PrerequisitosDialog } from "@/components/PrerequisitosDialog";
 
-type TopicoExt = Topico & { dominado?: boolean; ordem_didatica?: number };
+type TopicoExt = Topico & { dominado?: boolean; ordem_didatica?: number; modulo?: string | null };
 
 export const Route = createFileRoute("/_authenticated/materias/$id")({ component: MateriaDetail });
 
@@ -41,11 +41,28 @@ function MateriaDetail() {
     queryKey: ["topicos", user?.id, discId],
     queryFn: async () => {
       const { data } = await supabase.from("topicos").select("*")
-        .eq("disciplina_id", discId).order("tema");
+        .eq("disciplina_id", discId)
+        .order("ordem_didatica", { ascending: true })
+        .order("tema", { ascending: true });
       return (data ?? []) as TopicoExt[];
     },
     enabled: !!user,
   });
+
+  // Agrupa por módulo, preservando a ordem (ordem_didatica)
+  const grupos = useMemo(() => {
+    const map = new Map<string, TopicoExt[]>();
+    const ordemModulos: string[] = [];
+    (topicos ?? []).forEach((t) => {
+      const mod = (t.modulo && t.modulo.trim()) ? t.modulo : "Outros tópicos";
+      if (!map.has(mod)) { map.set(mod, []); ordemModulos.push(mod); }
+      map.get(mod)!.push(t);
+    });
+    // "Outros tópicos" sempre por último
+    const final = ordemModulos.filter((m) => m !== "Outros tópicos");
+    if (map.has("Outros tópicos")) final.push("Outros tópicos");
+    return final.map((m) => ({ modulo: m, items: map.get(m)! }));
+  }, [topicos]);
 
   // Quais tópicos têm pré-req pendente? Pega vínculos e cruza com .dominado
   const { data: pendentesIds } = useQuery({
@@ -105,21 +122,42 @@ function MateriaDetail() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-4">
         {topicos?.length === 0 && (
           <Card><CardContent className="p-6 text-center text-sm text-muted-foreground">
             Nenhum tópico ainda. Toque em "+" para adicionar.
           </CardContent></Card>
         )}
-        {topicos?.map((t) => (
-          <TopicoRow
-            key={t.id}
-            topico={t}
-            cor={disciplina?.cor ?? "#888"}
-            disciplinaId={discId}
-            temPendente={pendentesIds?.has(t.id) ?? false}
-          />
-        ))}
+        {grupos.map((g) => {
+          const total = g.items.length;
+          const dom = g.items.filter((t) => t.dominado).length;
+          return (
+            <section key={g.modulo} className="space-y-2">
+              <div
+                className="flex items-center justify-between gap-2 px-1 pt-2 border-l-4 pl-3 rounded-l"
+                style={{ borderColor: disciplina?.cor ?? "#888" }}
+              >
+                <h2 className="text-sm font-display font-bold uppercase tracking-wide">
+                  {g.modulo}
+                </h2>
+                <span className="text-[11px] text-muted-foreground shrink-0">
+                  {dom}/{total} dominados
+                </span>
+              </div>
+              <div className="space-y-2">
+                {g.items.map((t) => (
+                  <TopicoRow
+                    key={t.id}
+                    topico={t}
+                    cor={disciplina?.cor ?? "#888"}
+                    disciplinaId={discId}
+                    temPendente={pendentesIds?.has(t.id) ?? false}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
     </div>
   );
