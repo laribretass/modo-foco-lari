@@ -8,13 +8,13 @@ import {
   type Topico, type Disciplina,
 } from "@/lib/estudos";
 import { calcStreak } from "@/lib/streak";
-import { getBriefingDoDia } from "@/lib/coach.functions";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  CheckCircle2, Circle, Flame, Target, BookOpen, ChevronRight, Sparkles, Timer, AlertCircle, Bot,
+  CheckCircle2, Circle, Flame, Target, BookOpen, ChevronRight, Sparkles, Timer, AlertCircle,
 } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -140,7 +140,7 @@ function HojePage() {
         <StatCard icon={AlertCircle} label="Revisões" value={revisoesVencidas} color={revisoesVencidas > 0 ? "text-destructive" : "text-muted-foreground"} />
       </div>
 
-      <CoachCard />
+      
 
       <AnkiCard />
 
@@ -197,41 +197,6 @@ function HojePage() {
   );
 }
 
-function CoachCard() {
-  const fetchBriefing = useServerFn(getBriefingDoDia);
-  const dataKey = new Date().toISOString().slice(0, 10);
-  const { data, isLoading } = useQuery({
-    queryKey: ["briefing", dataKey],
-    queryFn: () => fetchBriefing(),
-    staleTime: 1000 * 60 * 60 * 6, // 6h
-    retry: false,
-  });
-
-  return (
-    <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-            <Bot className="w-5 h-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold text-primary mb-1">Coach IA · briefing do dia</div>
-            {isLoading ? (
-              <div className="space-y-1.5">
-                <div className="h-3 rounded bg-muted animate-pulse w-full" />
-                <div className="h-3 rounded bg-muted animate-pulse w-4/5" />
-              </div>
-            ) : data?.briefing ? (
-              <p className="text-sm leading-relaxed">{data.briefing}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">{data?.error ?? "Sem briefing por enquanto. Registre algumas sessões!"}</p>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 function StatCard({ icon: Icon, label, value, color }: any) {
   return (
