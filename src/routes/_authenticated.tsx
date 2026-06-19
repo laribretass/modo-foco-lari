@@ -7,10 +7,38 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { QuickQuestionsFAB } from "@/components/QuickQuestionsFAB";
 
+// AUTH DESATIVADA TEMPORARIAMENTE PARA PREVIEW PUBLICO.
+// Para reativar: descomentar o bloco beforeLoad abaixo.
+const DEMO_EMAIL = "demo@focototal.app";
+const DEMO_PASSWORD = "demo-foco-total-2026";
+
+async function ensureDemoSession() {
+  const { data } = await supabase.auth.getSession();
+  if (data.session) return;
+  const tryLogin = await supabase.auth.signInWithPassword({
+    email: DEMO_EMAIL,
+    password: DEMO_PASSWORD,
+  });
+  if (tryLogin.error) {
+    await supabase.auth.signUp({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    await supabase.auth.signInWithPassword({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    });
+  }
+}
+
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) throw redirect({ to: "/login" });
+    if (typeof window === "undefined") return;
+    try { await ensureDemoSession(); } catch {}
+    // Bloco original (reativar para exigir login):
+    // const { data } = await supabase.auth.getSession();
+    // if (!data.session) throw redirect({ to: "/login" });
   },
   component: AuthLayout,
 });
